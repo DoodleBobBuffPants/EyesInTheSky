@@ -1,8 +1,12 @@
 #Initiate drone video stream and media player
+import sys
+sys.path.append("..")
 import pyparrot.Bebop		#library containing drone commands
+import frontend.MediaPlayer as mp
 
 print("Starting stream") 	#starttest
 #Bebop.start_video_stream()
+mp.playVid("../frontend/testvideo.mp4")
 
 #drone sends rtp packets
 #need to find a way to save them
