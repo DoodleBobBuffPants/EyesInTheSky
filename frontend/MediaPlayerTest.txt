@@ -1,0 +1,4 @@
+Tested VLC player successfully plays test video - success
+Tested VLC player's web streaming capability - fail (flash player error)
+			No solution found after hours of research
+Tested opencv's ability to play video - success
