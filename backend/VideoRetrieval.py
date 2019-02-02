@@ -1,5 +1,5 @@
-#Receive video from drone and pass on to movement modules
-import pyparrot.Bebop
+#Initiate drone video stream and media player
+import pyparrot.Bebop		#library containing drone commands
 
 print("Starting stream") 	#starttest
 #Bebop.start_video_stream()
