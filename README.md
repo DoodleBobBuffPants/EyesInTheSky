@@ -1,4 +1,10 @@
 # EyesInTheSky
 Group Project
 
-Requirements: pyparrot (pip install pyparrot)
+Requirements:
+- pyparrot
+- zeroconf
+- opencv
+- VLC
+
+The MIT license covers use of the pyparrot library.
