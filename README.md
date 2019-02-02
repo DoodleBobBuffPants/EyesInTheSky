@@ -4,7 +4,6 @@ Group Project
 Requirements:
 - pyparrot
 - zeroconf
-- opencv
-- VLC
+- opencv (and FFmpeg)
 
 The MIT license covers use of the pyparrot library.
