@@ -18,5 +18,3 @@ def playVid(vidpath):
 	#release resources
 	vc.release()
 	cv.destroyAllWindows()
-vid = "testvideo.mp4"		#test video - should use rtp://localhost:8080
-playVid(vid)
