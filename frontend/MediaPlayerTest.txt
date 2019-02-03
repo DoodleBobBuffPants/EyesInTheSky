@@ -1,0 +1,15 @@
+Tested reading RTP packet manually to view video/frames
+			Non trivial task in terms of codecs and not enough information online to make this feesible in the time period required
+Tested VLC player successfully plays test video
+			Success
+Tested VLC player's web streaming capability
+			Fail (flash player error)
+			No solution found after hours of research into protocols and handling packets
+Tested FFmpeg as was recommended on forums
+			Non trivial to use
+Tested opencv's ability to play video
+			Success
+Tested FileLock
+			Successfull locking
+Tested custom locking implementation
+			Works for our purpose
