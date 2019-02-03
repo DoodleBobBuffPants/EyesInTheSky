@@ -10,7 +10,7 @@ print("Starting stream") 	#starttest
 #Bebop.start_video_stream()
 
 #start video stream as separate process as it is blocking
-vidPath = "../frontend/testvideo.mp4"
+vidPath = "../frontend/testvideo.mp4"		#should be rtp://localhost:55004 in reality
 streamProc = Thread(target = mp.playVid, args = [vidPath])
 streamProc.start()
 
@@ -19,6 +19,6 @@ streamProc.start()
 # - start video feed from drone
 # - open player in separate thread
 # - take frames and process them to get relative coordinates
-# - give to movement module on request (will be concurrent so need threadings)
+# - give to movement module on request (will be concurrent so need threading)
 
 print("Exiting stream")		#endtest
