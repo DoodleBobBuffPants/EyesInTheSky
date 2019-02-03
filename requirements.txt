@@ -1,0 +1,7 @@
+filelock==3.0.10
+ifaddr==0.1.6
+numpy==1.16.1
+opencv-python==4.0.0.21
+pyparrot==1.5.10
+untangle==1.1.1
+zeroconf==0.21.3
