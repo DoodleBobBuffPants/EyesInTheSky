@@ -10,6 +10,9 @@ class Drone:
     car_x = 0
     car_y = 0
 
+    # Use this flag if the car can't be found in the video feed
+    car_unknown = False
+
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
     scale_factor = 1
@@ -58,31 +61,39 @@ class Drone:
         # Alternative functions available:
         #   y = 100 * sin(pi/2 * x)
 
-        speed = 100 * math.sqrt(1 - (math.mod(coord) - 1)**2)
+        speed = 100 * math.sqrt(1 - (abs(coord) - 1)**2)
         if coord < 0:
             return speed * -1
         else:
             return speed
 
+    def sleep(self, time_length):
+        self.drone.safe_sleep(time_length)
+
+    def set_movement(self, roll, pitch, yaw, vertical_movement, duration):
+        self.drone.fly_direct(roll=roll, pitch=pitch, yaw=yaw, vertical_movement=vertical_movement, duration=duration)
+
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
     # Uses the fly_direct(roll, pitch, yaw, vertical_movement, duration) command
     # Initially don't use yaw. Use forward-backward and side-to-side movements.
-    # Should be changed so that spins to face the car and then always moves forwards
+    # Alternative : Change so that spins to face the car and then always moves forwards
     def follow_car(self):
         while True:
             if self.stop_flight:
-                continue
-
+                self.immediate_land()
+                break
+            if self.car_unknown:
+                self.lost_car()
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
             speed_x = self.calculate_speed(self.car_x) * self.scale_factor
             speed_y = self.calculate_speed(self.car_y) * self.scale_factor
-            self.drone.fly_direct(roll=speed_x, pitch=speed_y, yaw=0, vertical_movement=0, duration=self.movement_gap)
+            self.set_movement(speed_x, speed_y, 0, 0, self.movement_gap)
 
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
-            #sleep(self.movement_gap)  # deliberately non-existent function for now
+            self.sleep(self.movement_gap)  # deliberately non-existent function for now
 
 
     # In the event that the car cannot be found in the image
