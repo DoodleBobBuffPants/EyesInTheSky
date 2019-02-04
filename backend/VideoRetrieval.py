@@ -3,11 +3,15 @@
 import sys
 sys.path.append("..")
 from threading import Thread
-import pyparrot.Bebop		#library containing drone commands
+from pyparrot.Bebop import Bebop		#library containing drone commands
 import frontend.MediaPlayer as mp
 
 print("Starting stream") 	#starttest
-#Bebop.start_video_stream()
+
+#bebop = Bebop()
+#bebop.connect(10)
+#bebop.smart_sleep(5)
+#bebop.start_video_stream()
 
 #start video stream as separate process as it is blocking
 vidPath = "../frontend/testvideo.mp4"		#should be rtp://localhost:55004 in reality
