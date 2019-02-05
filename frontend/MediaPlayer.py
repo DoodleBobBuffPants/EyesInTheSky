@@ -17,8 +17,9 @@ def playVid(vidpath):
 			cv.imwrite("frame.jpg", frame)
 			lock.release_lock()
 			#close 'video' on key input 'q'
-			if (cv.waitKey(7) == ord('q')):
-				break
+			cv.waitKey(1)
+			#if (cv.waitKey(10) == ord('q')):
+				#break
 	#release resources
 	vc.release()
 	cv.destroyAllWindows()
