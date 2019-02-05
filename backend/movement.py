@@ -43,7 +43,6 @@ class Drone:
 
         self.drone.connect(10)
         
-        self.drone.set_max_tilt(5)
 
         self.drone.safe_takeoff(10)
 
@@ -88,7 +87,6 @@ class Drone:
         print(self.roll, self.pitch, self.yaw)
         self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement), duration=1)
 
-    # fasdaed
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
     # Uses the fly_direct(roll, pitch, yaw, vertical_movement, duration) command
