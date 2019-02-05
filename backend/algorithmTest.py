@@ -17,12 +17,10 @@ class TestDrone(Drone):
     # Sqaure box, with side length given here - drone at the centre
     field_of_view = 25;
 
-
     def __init__(self, x, y):
         super(Drone, self).__init__()
         self.world_x = x
         self.world_y = y
-
 
     def print_coords(self):
         print(self.world_x, " ", self.world_y)
@@ -31,9 +29,9 @@ class TestDrone(Drone):
         time.sleep(time_length)
 
     # Override the movement function so that movements are made within virtual world
-    def set_movement(self, roll, pitch, yaw, vertical_movement, duration):
-        self.world_x += roll * duration * self.test_scale_factor
-        self.world_y += pitch * duration * self.test_scale_factor
+    def set_movement(self, vertical_movement):
+        self.world_x += self.roll * self.movement_gap * self.test_scale_factor
+        self.world_y += self.pitch * self.movement_gap * self.test_scale_factor
 
 # Manages the coordinates of the drone and car in the virtual world
 # Determines the virtual coordinates of the car in relation to the drone
@@ -60,11 +58,6 @@ class World():
         # Choose a location for the car to start in the world
         self.car_x = 510
         self.car_y = 495
-
-        # Choose a location for the drone to start in the world
-
-
-
 
     # Calculates the position that the drone will see the car being in
     # Car must lie within the drones field of view, otherwise no location will be found
