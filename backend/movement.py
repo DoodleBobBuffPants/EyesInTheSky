@@ -24,6 +24,10 @@ class Drone:
     # Safety mechanism
     stop_flight = False
 
+    roll = 0
+    pitch = 0
+    yaw = 0
+
     def __init__(self):
         # Set limits on drone performance
         # e.g. max tilt angle
@@ -70,8 +74,8 @@ class Drone:
     def sleep(self, time_length):
         self.drone.safe_sleep(time_length)
 
-    def set_movement(self, roll, pitch, yaw, vertical_movement, duration):
-        self.drone.fly_direct(roll=roll, pitch=pitch, yaw=yaw, vertical_movement=vertical_movement, duration=duration)
+    def move(self, vertical_movement):
+        self.drone.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=vertical_movement, duration=self.movement_gap)
 
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
@@ -87,13 +91,17 @@ class Drone:
                 self.lost_car()
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
-            speed_x = self.calculate_speed(self.car_x) * self.scale_factor
-            speed_y = self.calculate_speed(self.car_y) * self.scale_factor
+            move()
+
+            # could be replaced by more sophisticated algorithm e.g. PID
+            self.roll self.calculate_speed(self.car_x) * self.scale_factor
+            self.pitch = self.calculate_speed(self.car_y) * self.scale_factor
+
             self.set_movement(speed_x, speed_y, 0, 0, self.movement_gap)
 
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
-            self.sleep(self.movement_gap)  # deliberately non-existent function for now
+            self.sleep(self.movement_gap)
 
 
     # In the event that the car cannot be found in the image
@@ -103,11 +111,3 @@ class Drone:
     #               Then gradually return the camera to its original vertically down angle.
     def lost_car(self):
         pass
-
-
-
-
-
-
-
-#
