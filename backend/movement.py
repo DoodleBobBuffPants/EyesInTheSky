@@ -73,6 +73,7 @@ class Drone:
     def set_movement(self, roll, pitch, yaw, vertical_movement, duration):
         self.drone.fly_direct(roll=roll, pitch=pitch, yaw=yaw, vertical_movement=vertical_movement, duration=duration)
 
+    # fasdaed
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
     # Uses the fly_direct(roll, pitch, yaw, vertical_movement, duration) command
