@@ -1,8 +1,38 @@
+import math
+
 from backend.movement import Drone
 import time
 from threading import Thread
 
 # Create sample world that the Car and Drone move within
+
+class Car:
+
+    def __init__(self, start_x, start_y):
+        self.x = start_x
+        self.y = start_y
+
+    # Can be any series of movements within the world. Should not be jumpy.
+    def move(self, world_x_limit, world_y_limit):
+        # Move in a circular motion
+        # First move to the edge of circle from the start location
+        while True:
+            if self.x > 0.9 * world_x_limit and self.y > 0.5 * world_y_limit:
+                break
+            if self.x < 0.9 * world_x_limit:
+                self.x += 0.1
+            if self.y < 0.5 * world_y_limit:
+                self.y += 0.1
+            time.sleep(0.001)
+
+        # Car should now be on the edge of the circle
+        # Now continuously move around in the circle
+        t = 0
+        while True:
+            self.x = world_x_limit / 2 + world_x_limit * 0.45 * math.cos(t)
+            self.y = world_y_limit / 2 + world_y_limit * 0.45 * math.sin(t)
+            t += 0.001
+            time.sleep(0.01) # Not related to t value
 
 
 
@@ -29,7 +59,7 @@ class TestDrone(Drone):
         time.sleep(time_length)
 
     # Override the movement function so that movements are made within virtual world
-    def set_movement(self, vertical_movement):
+    def move(self, vertical_movement):
         self.world_x += self.roll * self.movement_gap * self.test_scale_factor
         self.world_y += self.pitch * self.movement_gap * self.test_scale_factor
 
@@ -37,18 +67,19 @@ class TestDrone(Drone):
 # Determines the virtual coordinates of the car in relation to the drone
 class World():
 
-    car_x = 0
-    car_y = 0
+    #car_x = 0
+    #car_y = 0
 
-    drone_x = 0
-    drone_y = 0
+    #drone_x = 0
+    #drone_y = 0
 
 
     def __init__(self):
 
-        self.drone_x = 500
-        self.drone_y = 500
+        self.drone_x = 0
+        self.drone_y = 0
 
+        self.car = Car(0,0)
         self.drone = TestDrone(self.drone_x, self.drone_y)
 
         # Define the size of the world
@@ -56,27 +87,20 @@ class World():
         self.world_size_y = 1000
 
         # Choose a location for the car to start in the world
-        self.car_x = 510
-        self.car_y = 495
+        #self.car_x = 0
+        #self.car_y = 0
 
     # Calculates the position that the drone will see the car being in
     # Car must lie within the drones field of view, otherwise no location will be found
     def calculate_rel_position(self):
-        x = float(self.car_x - self.drone_x) / self.drone.field_of_view
-        y = float(self.car_y - self.drone_y) / self.drone.field_of_view
+        x = float(self.car.x - self.drone_x) / self.drone.field_of_view
+        y = float(self.car.y - self.drone_y) / self.drone.field_of_view
         if x < -1 or x > 1 or y < -1 or y > 1:
             self.drone.car_unknown = True
             return
         self.drone.car_x = x
         self.drone.car_y = y
         #print(x, y)
-
-    # Specify some movements for the car to do
-    def arbitrary_car_movements(self):
-        while True:
-            self.car_x += 1
-            self.car_y += 2
-            time.sleep(0.2)
 
     # Manage the world in a thread - updating the location of the drone as it moves, and calculating relative position of the car
     def manage(self):
@@ -86,7 +110,9 @@ class World():
             self.calculate_rel_position()
 
 
+#car = Car(0, 0)
 world = World()
+
 
 
 # Start the world managing
@@ -98,12 +124,13 @@ thread2 = Thread(target = world.drone.follow_car, args = [])
 thread2.start()
 
 # Start the car moving
-thread3 = Thread(target = world.arbitrary_car_movements, args = [])
+thread3 = Thread(target = world.car.move, args = [world.world_size_x, world.world_size_y])
 thread3.start()
 
 while True:
-    print(int(world.car_x), int(world.drone_x))
+    #print(int(world.car_x), int(world.drone_x))
     #world.drone.print_coords()
+    print(round(world.car.x, 2), " ", round(world.car.y, 2), "   ", round(world.drone_x, 2), " ", round(world.drone_y, 2))
     time.sleep(0.1)
 
 #

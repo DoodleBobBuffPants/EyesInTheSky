@@ -15,10 +15,10 @@ class Drone:
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 1
+    scale_factor = 10
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
-    movement_gap = 0.1
+    movement_gap = 0.01
 
     # A flag that when set will stop the drone following the car
     # Safety mechanism
@@ -99,16 +99,17 @@ class Drone:
                 break
             if self.car_unknown:
                 self.lost_car()
+                continue
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
 
             # could be replaced by more sophisticated algorithm e.g. PID
             self.roll = self.calculate_speed(self.car_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_y) * self.scale_factor
-            print(" -  - ", self.calculate_speed(self.car_x))
+            #print(" -  - ", self.calculate_speed(self.car_x))
 
             self.move(0)
-            break
+            #bteak
 
             # self.set_movement(speed_x, speed_y, 0, 0, self.movement_gap)
 
@@ -123,4 +124,8 @@ class Drone:
     #           Raise the angle of the camera slightly and spin around to find it
     #               Then gradually return the camera to its original vertically down angle.
     def lost_car(self):
-        pass
+        # First step: become stationary
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+
