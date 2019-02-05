@@ -31,13 +31,22 @@ class Drone:
     def __init__(self):
         # Set limits on drone performance
         # e.g. max tilt angle
-
+        
         # Should scaling mechanism be proportional to height of drone?
 
         # Add safety mechanism to allow immediate landing of the drone
 
         self.drone = Bebop()
         # connection and takeoff should be launched from here
+
+
+
+        self.drone.connect(10)
+        
+        self.drone.set_max_tilt(5)
+
+        self.drone.safe_takeoff(10)
+
 
         # Must make sure the camera is always pointing down - even when the drone is at an angle
 
@@ -72,10 +81,12 @@ class Drone:
             return speed
 
     def sleep(self, time_length):
-        self.drone.safe_sleep(time_length)
+        self.drone.smart_sleep(time_length)
+
 
     def move(self, vertical_movement):
-        self.drone.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=vertical_movement, duration=self.movement_gap)
+        print(self.roll, self.pitch, self.yaw)
+        self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement), duration=1)
 
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
@@ -91,13 +102,16 @@ class Drone:
                 self.lost_car()
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
-            move()
 
             # could be replaced by more sophisticated algorithm e.g. PID
-            self.roll self.calculate_speed(self.car_x) * self.scale_factor
+            self.roll = self.calculate_speed(self.car_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_y) * self.scale_factor
+            print(" -  - ", self.calculate_speed(self.car_x))
 
-            self.set_movement(speed_x, speed_y, 0, 0, self.movement_gap)
+            self.move(0)
+            break
+
+            # self.set_movement(speed_x, speed_y, 0, 0, self.movement_gap)
 
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
