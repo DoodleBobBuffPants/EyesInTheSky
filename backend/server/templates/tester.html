@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<form action="/change_rel_coords" method="POST">
+    Change X: <input id="new_x" />
+    Change Y: <input id="new_y" />
+    <input type="submit" value="GO"/>
+</form>
+
+<form action="/abort", method="POST">
+    <input type="submit", value="STOP">
+</form>
+
+<form action="/takeoff" method="POST">
+    <input type="submit" value="TAKE OFF">
+</form>
+
+</body>
+</html>
