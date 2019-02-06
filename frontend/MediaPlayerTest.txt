@@ -22,4 +22,4 @@ Tested playing the drone's stream after whitelisting necessary protocols in envi
 Tested playing the drone's stream
 			Successfully accepts and plays the drone's video stream
 Tested latency reduction techniques
-			- 
+			Success

@@ -3,14 +3,14 @@ import sys
 sys.path.append("..")
 import cv2 as cv
 from threading import Thread
-import queue.Queue as Queue
+from queue import Queue
 import backend.Lock as lock 		# custom naive lock
-import FrameGetter as fg
+import frontend.FrameGetter as fg
 def playVid(vidpath, bebop):
 	# queue of frames
-	queue = new Queue()
+	queue = Queue()
 	# new thread to get frames concurrently
-	fgProc = Thread(target = fg.frameGetter(), args = [queue, bebop, vidpath])
+	fgProc = Thread(target = fg.frameGetter, args = [queue, bebop, vidpath])
 	fgProc.start()
 	# loop through each frame, making hand over for analysis easier
 	while True:
