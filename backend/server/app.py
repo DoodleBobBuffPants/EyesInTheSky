@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, g, redirect
+from threading import Thread
+
+import flask
+from flask import Flask, render_template, request, g, redirect, abort
 
 from backend import movement
 
@@ -28,9 +31,29 @@ def takeoff():
 
 
 @app.route('/abort', methods=['POST'])
-def abort():
+def stop_it():
     stop_drone()
     return redirect('/')
+
+
+@app.route('/follow', methods=['POST'])
+def follow():
+    if g.drone is None:
+        abort(400, "no drone yet")
+
+    g.follow_thread = Thread(target=g.drone.follow_car, args=[])
+    g.follow_thread.start()
+
+
+@app.route('/follow_stop', methods=['POST'])
+def follow_stop():
+    if g.drone is None:
+        abort(400, "no drone yet")
+    elif g.follow_thread is None:
+        abort(400, "not following")
+
+    stop_drone()
+    # Find a way to kill the follow thread or change its variables
 
 
 def get_drone():  # WARNING: This will also cause the drone to TAKE OFF

@@ -9,17 +9,24 @@
 </head>
 <body>
 
-<form action="/change_rel_coords" method="POST">
-    Change X: <input id="new_x" />
-    Change Y: <input id="new_y" />
+<form action="{{ url_for('change') }}" method="POST">
+    <label for="new_x">Change X:</label><input id="new_x"/>
+    <label for="new_y">Change Y: </label><input id="new_y"/>
     <input type="submit" value="GO"/>
 </form>
 
-<form action="/abort", method="POST">
-    <input type="submit", value="STOP">
+<form action="{{ url_for('stop_it') }}" method="POST">
+    <input type="submit" value="ABORT">
 </form>
 
-<form action="/takeoff" method="POST">
+<form action="{{ url_for('follow_stop') }}" method="POST">
+    <input type="submit" value="Stop Following">
+</form>
+<form action="{{ url_for('follow') }}" method="POST">
+    <input type="submit" value="Start Following">
+</form>
+
+<form action="{{ url_for('takeoff') }}" method="POST">
     <input type="submit" value="TAKE OFF">
 </form>
 
