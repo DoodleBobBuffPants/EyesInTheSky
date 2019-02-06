@@ -10,13 +10,13 @@
 <body>
 
 <form action="{{ url_for('change') }}" method="POST">
-    <label for="new_x">Change X:</label><input id="new_x"/>
-    <label for="new_y">Change Y: </label><input id="new_y"/>
+    <label for="new_x">Change relative X:</label><input id="new_x"/>
+    <label for="new_y">Change relative Y: </label><input id="new_y"/>
     <input type="submit" value="GO"/>
 </form>
 
 <form action="{{ url_for('stop_it') }}" method="POST">
-    <input type="submit" value="ABORT">
+    <input type="submit" value="ABORT" style="font-size: xx-large; color: red">
 </form>
 
 <form action="{{ url_for('follow_stop') }}" method="POST">
@@ -28,6 +28,12 @@
 
 <form action="{{ url_for('takeoff') }}" method="POST">
     <input type="submit" value="TAKE OFF">
+</form>
+<form action="{{ url_for('connect') }}" method="POST">
+    <input type="submit" value="CONNECT" >
+</form>
+<form action="{{ url_for('disconnect') }}" method="POST">
+    <input type="submit" value="DISCONNECT">
 </form>
 
 </body>

@@ -2,6 +2,11 @@ from pyparrot.Bebop import Bebop
 import math
 
 
+class DroneException(Exception):
+    pass
+
+
+# TODO: subclass from pyparrot.bebop
 class Drone:
     drone = None
 
@@ -21,10 +26,7 @@ class Drone:
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     movement_gap = 0.01
 
-    # A flag that when set will stop the drone following the car
-    # Safety mechanism
-    stop_flight = False
-
+    # Current values of angles, from -100 to 100 (essentially a % of the set max value)
     roll = 0
     pitch = 0
     yaw = 0
@@ -40,15 +42,18 @@ class Drone:
         self.drone = Bebop()
         # connection and takeoff should be launched from here
 
-
-
-        self.drone.connect(10)
-        
-
-        self.drone.safe_takeoff(10)
-
-
+        if not self.drone.connect(10):
+            self.connected = False
+            # raise DroneException - dont raise so we can actually test without the whole thing dying
+        else:
+            self.connected = True
         # Must make sure the camera is always pointing down - even when the drone is at an angle
+
+    def takeoff(self):
+        if self.connected:
+            self.drone.safe_takeoff(10)
+        else:
+            raise DroneException("Not connected")
 
     # One option for updating the coordinates of the car's relative position.
     # Can be called by the image recognition area.
@@ -95,7 +100,7 @@ class Drone:
     def move(self, vertical_movement):
         print(self.roll, self.pitch, self.yaw)
         self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement),
-                              duration=1)
+                              duration=self.movement_gap)
 
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
