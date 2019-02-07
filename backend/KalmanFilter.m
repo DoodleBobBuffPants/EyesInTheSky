@@ -1,31 +1,50 @@
 function KalmanFilter
     %get and modify params
     param = getDefaultParameters();         % get parameters that work well
-    param.motionModel = 'ConstantVelocity'; % switch from ConstantAcceleration
-                                            % to ConstantVelocity
+    
+    %START POSITION
+    param.initialLocation = [0, 0];  % location that's not based on an actual detection
+    param.initialEstimateError = 100*ones(1,3); % use relatively small values
+    
+    %MOTION MODEL
+    param.motionModel = 'ConstantVelocity'; % switch from ConstantAcceleration to ConstantVelocity
     % After switching motion models, drop noise specification entries
     % corresponding to acceleration.
     param.initialEstimateError = param.initialEstimateError(1:2);
     param.motionNoise          = param.motionNoise(1:2);
-    param.segmentationThreshold = 0.0005; % smaller value resulting in noisy detections
-    param.measurementNoise      = 12500;  % increase the value to compensate
+    
+    %NOISE DETECTION
+    %larger value gives more accurate detection but too large will miss
+    %   object. May need to dynamically change to keep detection
+    param.segmentationThreshold = 0.005; % smaller value resulting in 
+                                        %noisy detections
+    %changes wrt above. Smaller value for larger threshold.
+    %setting to near-0 will use measured value, large value will use
+    %   predictions mostly
+    param.measurementNoise      = 1250;  % increase the value to compensate
                                           % for the increase in measurement noise
     % vars used for tracking single object
     frame            = [];  % A video frame
     detectedLocation = [];  % The detected location
     trackedLocation  = [];  % The tracked location
     label            = '';  % Label for the ball
-    utilities        = createUtilities(param);;  % Utilities used to process the video
+    utilities        = createUtilities(param);  % Utilities used to process the video
 
     trackSingleObject(param); % visualize the results
 
     %REQUIRED FUNCTS
     function param = getDefaultParameters
+      %choose from ConstantAcceleration, ConstantVelocity
       param.motionModel           = 'ConstantAcceleration';
+      %either where detected or some estimated position.
       param.initialLocation       = 'Same as first detection';
+      %error in first location. Small for first detection, large for stated position
       param.initialEstimateError  = 1E5 * ones(1, 3);
+      %noise for acceleration, velocity, position
       param.motionNoise           = [25, 10, 1];
+      %Estimated inaccuracy in measuring
       param.measurementNoise      = 25;
+      %theshold for detecting object: large may miss, small v noisy
       param.segmentationThreshold = 0.05;
     end
 
@@ -120,12 +139,15 @@ function KalmanFilter
     end
 
     function utilities = createUtilities(param)
+      %file setup
+      CurDir = pwd;
+      addpath(strcat(CurDir,'/TrainingData'));
       % Create System objects for reading video, displaying video, extracting
       % foreground, and analyzing connected components.
-      utilities.videoReader = vision.VideoFileReader('singleball.mp4');
+      utilities.videoReader = vision.VideoFileReader('/TrainingData/data3.mp4'); %NOTE TRAINING VIDEO SET HERE
       utilities.videoPlayer = vision.VideoPlayer('Position', [100,100,500,400]);
       utilities.foregroundDetector = vision.ForegroundDetector(...
-        'NumTrainingFrames', 10, 'InitialVariance', param.segmentationThreshold);
+        'NumTrainingFrames', 24, 'InitialVariance', param.segmentationThreshold);
       utilities.blobAnalyzer = vision.BlobAnalysis('AreaOutputPort', false, ...
         'MinimumBlobArea', 70, 'CentroidOutputPort', true);
 
