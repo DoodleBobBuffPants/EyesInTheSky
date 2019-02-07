@@ -15,7 +15,7 @@ class Drone:
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 10
+    scale_factor = 1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     movement_gap = 0.01
@@ -39,10 +39,7 @@ class Drone:
         self.drone = Bebop()
         # connection and takeoff should be launched from here
 
-
-
         self.drone.connect(10)
-        
 
         self.drone.safe_takeoff(10)
 
@@ -57,10 +54,13 @@ class Drone:
 
     # For emergency manual override
     def immediate_land(self):
-        # Set the stop_flight flag
         # Go to level flight
-        # Perform safe land
-        pass
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+
+        # Perform a safe land
+        self.drone.safe_land(10)
 
     # Given one of the coordinates, return the speed required to move in that direction.
     # Returned value is percentage of maximum tilt angle (-100 to 100). May be scaled elsewhere

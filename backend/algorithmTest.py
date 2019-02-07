@@ -1,5 +1,4 @@
 import math
-
 from backend.movement import Drone
 import time
 from threading import Thread
@@ -17,13 +16,13 @@ class Car:
         # Move in a circular motion
         # First move to the edge of circle from the start location
         while True:
-            if self.x > 0.9 * world_x_limit and self.y > 0.5 * world_y_limit:
+            if self.x >= 0.95 * world_x_limit and self.y >= 0.5 * world_y_limit:
                 break
-            if self.x < 0.9 * world_x_limit:
+            if self.x <= 0.95 * world_x_limit:
                 self.x += 0.1
-            if self.y < 0.5 * world_y_limit:
+            if self.y <= 0.5 * world_y_limit:
                 self.y += 0.1
-            time.sleep(0.001)
+            time.sleep(0.0001)
 
         # Car should now be on the edge of the circle
         # Now continuously move around in the circle
@@ -32,7 +31,7 @@ class Car:
             self.x = world_x_limit / 2 + world_x_limit * 0.45 * math.cos(t)
             self.y = world_y_limit / 2 + world_y_limit * 0.45 * math.sin(t)
             t += 0.001
-            time.sleep(0.01) # Not related to t value
+            time.sleep(0.001) # Not related to t value
 
 
 
@@ -41,7 +40,7 @@ class TestDrone(Drone):
     world_x = 0
     world_y = 0
     # The tilt angles won't directly convert into virtual world movement. Scale with this
-    test_scale_factor = 0.1
+    test_scale_factor = 1
 
     # Drone can see objects within a box.
     # Sqaure box, with side length given here - drone at the centre
@@ -117,19 +116,18 @@ world = World()
 
 # Start the world managing
 thread1 = Thread(target = world.manage, args = [])
-thread1.start()
 
 # Set the drone to start following the car
 thread2 = Thread(target = world.drone.follow_car, args = [])
-thread2.start()
 
 # Start the car moving
 thread3 = Thread(target = world.car.move, args = [world.world_size_x, world.world_size_y])
+
+thread1.start()
+thread2.start()
 thread3.start()
 
 while True:
-    #print(int(world.car_x), int(world.drone_x))
-    #world.drone.print_coords()
     print(round(world.car.x, 2), " ", round(world.car.y, 2), "   ", round(world.drone_x, 2), " ", round(world.drone_y, 2))
     time.sleep(0.1)
 
