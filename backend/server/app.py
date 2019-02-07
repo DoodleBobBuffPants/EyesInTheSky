@@ -25,9 +25,11 @@ def change():
         print(True)
         x = request.form["new_x"]
         y = request.form["new_y"]
-        print(x,y)
+
+        print(x, y)
         drone.car_rel_x = float(x)
         drone.car_rel_y = float(y)
+
         return redirect('/')
     else:
         return abort(400, "No drone yet")
@@ -43,7 +45,7 @@ def takeoff():
 def stop_it():
     """ Lands drone in emergency, doesn't disconnect"""
     drone.immediate_land()
-    #drone.drone.safe_land(5)
+    # drone.drone.safe_land(5)
     return redirect('/')
 
 
@@ -83,7 +85,7 @@ def follow_stop():
     if drone is not None:
         drone.stop_flight = True
         drone.hover()
-        #drone.immediate_land()  # Land drone, but stay connected
+        # drone.immediate_land()  # Land drone, but stay connected
 
     # Find a way to kill the follow thread ??
     return redirect('/')

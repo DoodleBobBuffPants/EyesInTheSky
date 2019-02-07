@@ -31,7 +31,7 @@ class Drone:
     pitch = 0
     yaw = 0
 
-    def __init__(self):
+    def __init__(self, max_tilt=5):
         # Set limits on drone performance
         # e.g. max tilt angle
 
@@ -41,12 +41,12 @@ class Drone:
 
         self.drone = Bebop()
         # connection and takeoff should be launched from here
+        self.drone.set_max_tilt(max_tilt)
 
-        if not self.drone.connect(10):
-            self.connected = False
-            # raise DroneException - dont raise so we can actually test without the whole thing dying
-        else:
-            self.connected = True
+        self.connected = self.drone.connect(10)
+        # raise DroneException - dont raise so we can actually test without the whole thing dying
+
+        self.drone.set_max_tilt(max_tilt)
         # Must make sure the camera is always pointing down - even when the drone is at an angle
 
     def takeoff(self):
