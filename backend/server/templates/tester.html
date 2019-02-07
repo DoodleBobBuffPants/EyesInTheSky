@@ -10,8 +10,8 @@
 <body>
 
 <form action="{{ url_for('change') }}" method="POST">
-    <label for="new_x">Change relative X:</label><input id="new_x"/>
-    <label for="new_y">Change relative Y: </label><input id="new_y"/>
+    <label for="new_x">Change relative X:</label><input id="new_x" name="new_x"/>
+    <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>
     <input type="submit" value="GO"/>
 </form>
 

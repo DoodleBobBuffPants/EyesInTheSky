@@ -20,12 +20,14 @@ def hello_world():
 
 @app.route('/change_rel_coords', methods=['POST'])
 def change():
+    print(drone)
     if drone:
+        print(True)
         x = request.form["new_x"]
         y = request.form["new_y"]
-
-        drone.car_rel_x = x
-        drone.car_rel_y = y
+        print(x,y)
+        drone.car_rel_x = float(x)
+        drone.car_rel_y = float(y)
         return redirect('/')
     else:
         return abort(400, "No drone yet")
@@ -40,8 +42,8 @@ def takeoff():
 @app.route('/abort', methods=['POST'])
 def stop_it():
     """ Lands drone in emergency, doesn't disconnect"""
-    # drone.immediate_land()
-    drone.drone.safe_land(5)
+    drone.immediate_land()
+    #drone.drone.safe_land(5)
     return redirect('/')
 
 
@@ -64,8 +66,13 @@ def follow():
     if drone is None:
         abort(400, "no drone yet")
 
+    drone.stop_flight = False
     follow_thread = Thread(target=drone.follow_car, args=[])
     follow_thread.start()
+    follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
+    follow_thread2.start()
+
+    return redirect('/')
 
 
 @app.route('/follow_stop', methods=['POST'])
@@ -75,9 +82,11 @@ def follow_stop():
 
     if drone is not None:
         drone.stop_flight = True
-        drone.immediate_land()  # Land drone, but stay connected
+        drone.hover()
+        #drone.immediate_land()  # Land drone, but stay connected
 
     # Find a way to kill the follow thread ??
+    return redirect('/')
 
 
 if __name__ == "__main__":

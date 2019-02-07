@@ -1,6 +1,6 @@
 from pyparrot.Bebop import Bebop
 import math
-
+import time
 
 class DroneException(Exception):
     pass
@@ -21,7 +21,7 @@ class Drone:
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 1
+    scale_factor = 0.1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     movement_gap = 0.01
@@ -71,6 +71,10 @@ class Drone:
 
         # Perform a safe land
         self.stop_flight = True
+
+        self.pitch = 0
+        self.roll = 0
+        self.yaw = 0
         self.drone.safe_land(5)
 
     def teardown(self):
@@ -99,8 +103,31 @@ class Drone:
 
     def move(self, vertical_movement):
         print(self.roll, self.pitch, self.yaw)
-        self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement),
+        if int(self.roll) == 0 and int(self.pitch) == 0 and int(self.yaw) == 0:
+            self.drone.flat_trim(0)
+        else:
+            self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement),
                               duration=self.movement_gap)
+
+    def hover(self):
+        self.pitch = 0
+        self.roll = 0
+        self.yaw = 0
+
+
+    def slowdown(self, x, duration):
+        print([i * 0.01 for i in range(int(10000*x), -int(10000*x) - 1, -int(100*x))])
+        for i in [i * 0.01 for i in range(int(10000*x), -int(10000*x) - 1, - int(100*x))]:
+
+            print("i: ", i)
+            self.car_rel_x = i
+            self.car_rel_y = i
+            time.sleep(duration / 100)
+
+        self.car_rel_x = 0
+        self.car_rel_y = 0
+
+
 
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
@@ -110,7 +137,7 @@ class Drone:
     def follow_car(self):
         while True:
             if self.stop_flight:
-                self.immediate_land()
+                #self.immediate_land()
                 break
             if self.car_unknown:
                 self.lost_car()
