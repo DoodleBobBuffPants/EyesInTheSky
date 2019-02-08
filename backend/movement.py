@@ -2,6 +2,7 @@ from pyparrot.Bebop import Bebop
 import math
 import time
 
+
 class DroneException(Exception):
     pass
 
@@ -12,8 +13,8 @@ class Drone:
 
     # Stores the position of the car in relation to the drone.
     # Each value in range -1 to 1
-    car_x = 0
-    car_y = 0
+    car_rel_x = 0
+    car_rel_y = 0
 
     # Safety flags
     car_unknown = False  # car out of frame
@@ -106,19 +107,18 @@ class Drone:
         if int(self.roll) == 0 and int(self.pitch) == 0 and int(self.yaw) == 0:
             self.drone.flat_trim(0)
         else:
-            self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw), vertical_movement=int(vertical_movement),
-                              duration=self.movement_gap)
+            self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw),
+                                  vertical_movement=int(vertical_movement),
+                                  duration=self.movement_gap)
 
     def hover(self):
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
 
-
     def slowdown(self, x, duration):
-        print([i * 0.01 for i in range(int(10000*x), -int(10000*x) - 1, -int(100*x))])
-        for i in [i * 0.01 for i in range(int(10000*x), -int(10000*x) - 1, - int(100*x))]:
-
+        print([i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, -int(100 * x))])
+        for i in [i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, - int(100 * x))]:
             print("i: ", i)
             self.car_rel_x = i
             self.car_rel_y = i
@@ -126,8 +126,6 @@ class Drone:
 
         self.car_rel_x = 0
         self.car_rel_y = 0
-
-
 
     # Runs in a continuous loop that sets the drone movements based on the cars location.
     # Should be run in a separate thread.
@@ -137,7 +135,7 @@ class Drone:
     def follow_car(self):
         while True:
             if self.stop_flight:
-                #self.immediate_land()
+                # self.immediate_land()
                 break
             if self.car_unknown:
                 self.lost_car()
@@ -147,9 +145,9 @@ class Drone:
 
             # v. naive
             # could be replaced by more sophisticated algorithm e.g. PID
-            self.roll = self.calculate_speed(self.car_x) * self.scale_factor
-            self.pitch = self.calculate_speed(self.car_y) * self.scale_factor
-            #print(" -  - ", self.calculate_speed(self.car_x))
+            self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
+            self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
+            # print(" -  - ", self.calculate_speed(self.car_x))
 
             self.move(0)
 
@@ -169,4 +167,3 @@ class Drone:
         self.roll = 0
         self.pitch = 0
         self.yaw = 0
-

@@ -1,4 +1,4 @@
-'''naive lock, but works for our use'''
+"""naive lock, but works for our use"""
 # lock variable
 lock = 0
 
