@@ -7,17 +7,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Drone Controller</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style>
+        .mt-2 {
+            margin-top: 2px;
+            margin-bottom: 2px
+        }
+
+    </style>
 </head>
 <body>
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-      <h3>Errors:</h3>
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+        <h3>Errors:</h3>
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endwith %}
 {% block body %}{% endblock %}
 <form action="{{ url_for('change') }}" method="POST">
@@ -25,6 +34,36 @@
     <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>
     <input type="submit" value="GO"/>
 </form>
+
+<div class="container">
+    <div class="row mt-2">
+        <button id="abort" class="btn btn-danger btn-block">ABORT</button>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="start_follow" class="btn btn-primary btn-block">START FOLLOWING</button>
+        </div>
+        <div class="col">
+            <button id="stop_follow" class="btn btn-secondary btn-block">STOP FOLLOWING</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="connect" class="btn btn-primary btn-block">CONNECT</button>
+        </div>
+        <div class="col">
+            <button id="disconnect" class="btn btn-secondary btn-block">DISCONNECT</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="take off" class="btn btn-success btn-block">TAKE OFF</button>
+        </div>
+    </div>
+</div>
 
 <form action="{{ url_for('stop_it') }}" method="POST">
     <input type="submit" value="ABORT" style="font-size: xx-large; color: red">
@@ -41,7 +80,7 @@
     <input type="submit" value="TAKE OFF">
 </form>
 <form action="{{ url_for('connect') }}" method="POST">
-    <input type="submit" value="CONNECT" >
+    <input type="submit" value="CONNECT">
 </form>
 <form action="{{ url_for('disconnect') }}" method="POST">
     <input type="submit" value="DISCONNECT">
