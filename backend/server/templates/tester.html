@@ -5,10 +5,21 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Drone Controller</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <h3>Errors:</h3>
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% block body %}{% endblock %}
 <form action="{{ url_for('change') }}" method="POST">
     <label for="new_x">Change relative X:</label><input id="new_x" name="new_x"/>
     <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>

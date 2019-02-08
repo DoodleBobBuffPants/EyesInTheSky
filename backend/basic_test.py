@@ -2,7 +2,7 @@ import backend.movement as movement
 import time
 from threading import Thread
 
-drone = movement.Drone()  # creates connection, and takes off
+drone = movement.FollowingDrone()  # creates connection, and takes off
 
 drone.car_rel_y = 0.1
 drone.car_rel_x = 0.1

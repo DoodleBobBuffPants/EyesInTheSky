@@ -1,5 +1,5 @@
 import math
-from backend.movement import Drone
+from backend.movement import FollowingDrone
 import time
 from threading import Thread
 
@@ -35,7 +35,7 @@ class Car:
             time.sleep(0.001)  # Not related to t value
 
 
-class TestDrone(Drone):
+class TestFollowingDrone(FollowingDrone):
     world_x = 0
     world_y = 0
     # The tilt angles won't directly convert into virtual world movement. Scale with this
@@ -46,7 +46,7 @@ class TestDrone(Drone):
     field_of_view = 25
 
     def __init__(self, x, y):
-        super(Drone, self).__init__()
+        super(FollowingDrone, self).__init__()
         self.world_x = x
         self.world_y = y
 
@@ -78,7 +78,7 @@ class World:
         self.drone_y = 0
 
         self.car = Car(0, 0)
-        self.drone = TestDrone(self.drone_x, self.drone_y)
+        self.drone = TestFollowingDrone(self.drone_x, self.drone_y)
 
         # Define the size of the world
         self.world_size_x = 1000

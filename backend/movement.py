@@ -8,51 +8,94 @@ class DroneException(Exception):
 
 
 # TODO: subclass from pyparrot.bebop
-class Drone:
+class FollowingDrone(Bebop):
     drone = None
 
-    # Stores the position of the car in relation to the drone.
+    # Position of the car in relation to the drone.
     # Each value in range -1 to 1
-    car_rel_x = 0
-    car_rel_y = 0
+    # User properties here to avoid setting to values outside [-1,1]
+    _car_rel_y: float = 0
+    _car_rel_x: float = 0
+
+    @property
+    def car_rel_x(self):
+        return self._car_rel_x
+
+    @car_rel_x.setter
+    def car_rel_x(self, x):
+        self._car_rel_x = self.clamp(x, -1, 1)
+
+    @property
+    def car_rel_y(self):
+        return self._car_rel_y
+
+    @car_rel_y.setter
+    def car_rel_y(self, y):
+        self._car_rel_y = self.clamp(y, -1, 1)
 
     # Safety flags
-    car_unknown = False  # car out of frame
-    stop_flight = False  # emergency stop
+    car_unknown: bool = False  # car out of frame
+    stop_following: bool = False  # emergency stop
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
     scale_factor = 0.1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
-    movement_gap = 0.01
+    movement_gap: float = 0.01
 
     # Current values of angles, from -100 to 100 (essentially a % of the set max value)
-    roll = 0
-    pitch = 0
-    yaw = 0
+    # Use properties to ensure ints in range [-100,100]
+    _roll: int = 0
+    _pitch: int = 0
+    _yaw: int = 0
 
-    def __init__(self, max_tilt=5):
-        # Set limits on drone performance
-        # e.g. max tilt angle
+    @property
+    def roll(self):
+        return self._roll
+
+    @roll.setter
+    def roll(self, x):
+        _roll = int(self.clamp(x, -100, 100))
+
+    @property
+    def pitch(self):
+        return self._pitch
+
+    @pitch.setter
+    def pitch(self, x):
+        _pitch = int(self.clamp(x, -100, 100))
+
+    @property
+    def yaw(self):
+        return self._yaw
+
+    @yaw.setter
+    def yaw(self, x):
+        _yaw = int(self.clamp(x, -100, 100))
+
+    def __init__(self, max_tilt: int = 5, max_height: int = 1, num_retries: int = 10):
+        """
+        :param max_tilt: maximum tilt angle, related to max speed
+        :param max_height: height in metres
+        """
+        super().__init__()
 
         # Should scaling mechanism be proportional to height of drone?
+        # Should we set scale here?
+        # Try to connect, do nothing on connection failure to allow connection from interface
+        self.connected = self.connect(num_retries)
 
-        # Add safety mechanism to allow immediate landing of the drone
+        # Set safety limits
+        if self.connected:
+            self.set_max_tilt(max_tilt)  # proxy for max speed
+            self.set_max_altitude(max_height)  # in metres
 
-        self.drone = Bebop()
-        # connection and takeoff should be launched from here
-        self.drone.set_max_tilt(max_tilt)
-
-        self.connected = self.drone.connect(10)
-        # raise DroneException - dont raise so we can actually test without the whole thing dying
-
-        self.drone.set_max_tilt(max_tilt)
         # Must make sure the camera is always pointing down - even when the drone is at an angle
 
     def takeoff(self):
         if self.connected:
-            self.drone.safe_takeoff(10)
+            self.safe_takeoff(10)
         else:
             raise DroneException("Not connected")
 
@@ -70,21 +113,19 @@ class Drone:
         self.pitch = 0
         self.yaw = 0
 
-        # Perform a safe land
-        self.stop_flight = True
+        self.stop_following = True
 
-        self.pitch = 0
-        self.roll = 0
-        self.yaw = 0
-        self.drone.safe_land(5)
+        self.safe_land(5)
 
-    def teardown(self):
-        self.drone.disconnect()
+    # TODO: move to another 'utils' module?
+    @staticmethod
+    def clamp(n, minn, maxn):
+        return max(min(maxn, n), minn)
 
     # Given one of the coordinates, return the speed required to move in that direction.
     # Returned value is percentage of maximum tilt angle (-100 to 100). May be scaled elsewhere
     @staticmethod
-    def calculate_speed(coord):
+    def calculate_speed(coord: float) -> float:
         # Using equation:
         #   y = 100 * sqrt(1 - (x-1)^2) for 0 < x < 1
         # For values -1 < 1, this formula in used
@@ -100,21 +141,20 @@ class Drone:
             return speed
 
     def sleep(self, time_length):
-        self.drone.smart_sleep(time_length)
+        self.smart_sleep(time_length)
+        self.calculate_speed(2)
 
     def move(self, vertical_movement):
-        print(self.roll, self.pitch, self.yaw)
-        if int(self.roll) == 0 and int(self.pitch) == 0 and int(self.yaw) == 0:
-            self.drone.flat_trim(0)
+        if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
+            self.flat_trim(0)
         else:
-            self.drone.fly_direct(int(self.roll), int(self.pitch), int(self.yaw),
-                                  vertical_movement=int(vertical_movement),
-                                  duration=self.movement_gap)
+            self.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=int(vertical_movement), duration=self.movement_gap)
 
     def hover(self):
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
+        self.flat_trim(0)
 
     def slowdown(self, x, duration):
         print([i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, -int(100 * x))])
@@ -134,8 +174,7 @@ class Drone:
     # Alternative : Change so that spins to face the car and then always moves forwards
     def follow_car(self):
         while True:
-            if self.stop_flight:
-                # self.immediate_land()
+            if self.stop_following:
                 break
             if self.car_unknown:
                 self.lost_car()
@@ -147,7 +186,6 @@ class Drone:
             # could be replaced by more sophisticated algorithm e.g. PID
             self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
-            # print(" -  - ", self.calculate_speed(self.car_x))
 
             self.move(0)
 
@@ -167,3 +205,7 @@ class Drone:
         self.roll = 0
         self.pitch = 0
         self.yaw = 0
+
+
+if __name__ == "__main__":
+    d = FollowingDrone(num_retries=1)
