@@ -33,10 +33,19 @@
 
 <div class="container">
     <div class="row mt-2">
+
         <div class="form-group">
-            <label for="new_x">Change relative X:</label><input id="new_x" name="new_x"/>
-            <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>
-            <button id="change" class="btn btn-primary" onclick="change()">change relative coords</button>
+            <div class="form-row">
+                <div class="col">
+                    <input class="form-control" id="new_x" name="new_x" placeholder="relative x"/>
+                </div>
+                <div class="col">
+                    <input class="form-control" id="new_y" name="new_y" placeholder="relative x"/>
+                </div>
+                <div class="col">
+                    <button id="change" class="btn btn-primary btn-block" onclick="change()">change relative coords</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row mt-2">
@@ -67,27 +76,6 @@
         </div>
     </div>
 </div>
-
-{#<form action="{{ url_for('stop_it') }}" method="POST">#}
-{#    <input type="submit" value="ABORT" style="font-size: xx-large; color: red">#}
-{#</form>#}
-{##}
-{#<form action="{{ url_for('follow_stop') }}" method="POST">#}
-{#    <input type="submit" value="Stop Following">#}
-{#</form>#}
-{#<form action="{{ url_for('follow') }}" method="POST">#}
-{#    <input type="submit" value="Start Following">#}
-{#</form>#}
-{##}
-{#<form action="{{ url_for('takeoff') }}" method="POST">#}
-{#    <input type="submit" value="TAKE OFF">#}
-{#</form>#}
-{#<form action="{{ url_for('connect') }}" method="POST">#}
-{#    <input type="submit" value="CONNECT">#}
-{#</form>#}
-{#<form action="{{ url_for('disconnect') }}" method="POST">#}
-{#    <input type="submit" value="DISCONNECT">#}
-{#</form>#}
 
 <script type="text/javascript">
     function abort() {
