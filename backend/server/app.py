@@ -33,7 +33,6 @@ def change():
     except Exception as e:
         print(str(e))
         flash(str(e))
-
     return redirect(url_for('home'))
 
 

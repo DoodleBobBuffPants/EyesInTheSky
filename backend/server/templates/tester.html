@@ -29,62 +29,105 @@
     {% endif %}
 {% endwith %}
 {% block body %}{% endblock %}
-<form action="{{ url_for('change') }}" method="POST">
-    <label for="new_x">Change relative X:</label><input id="new_x" name="new_x"/>
-    <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>
-    <input type="submit" value="GO"/>
-</form>
+
 
 <div class="container">
     <div class="row mt-2">
-        <button id="abort" class="btn btn-danger btn-block">ABORT</button>
+        <div class="form-group">
+            <label for="new_x">Change relative X:</label><input id="new_x" name="new_x"/>
+            <label for="new_y">Change relative Y: </label><input id="new_y" name="new_y"/>
+            <button id="change" class="btn btn-primary" onclick="change()">change relative coords</button>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <button id="abort" class="btn btn-danger btn-block" onclick="abort()">ABORT</button>
     </div>
 
     <div class="row mt-2">
         <div class="col">
-            <button id="start_follow" class="btn btn-primary btn-block">START FOLLOWING</button>
+            <button id="start_follow" class="btn btn-primary btn-block" onclick="follow()">START FOLLOWING</button>
         </div>
         <div class="col">
-            <button id="stop_follow" class="btn btn-secondary btn-block">STOP FOLLOWING</button>
-        </div>
-    </div>
-
-    <div class="row mt-2">
-        <div class="col">
-            <button id="connect" class="btn btn-primary btn-block">CONNECT</button>
-        </div>
-        <div class="col">
-            <button id="disconnect" class="btn btn-secondary btn-block">DISCONNECT</button>
+            <button id="stop_follow" class="btn btn-secondary btn-block" onclick="stop_follow()">STOP FOLLOWING</button>
         </div>
     </div>
 
     <div class="row mt-2">
         <div class="col">
-            <button id="take off" class="btn btn-success btn-block">TAKE OFF</button>
+            <button id="connect" class="btn btn-primary btn-block" onclick="connect()">CONNECT</button>
+        </div>
+        <div class="col">
+            <button id="disconnect" class="btn btn-secondary btn-block" onclick="disconnect()">DISCONNECT</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="take off" class="btn btn-success btn-block" onclick="takeoff()">TAKE OFF</button>
         </div>
     </div>
 </div>
 
-<form action="{{ url_for('stop_it') }}" method="POST">
-    <input type="submit" value="ABORT" style="font-size: xx-large; color: red">
-</form>
+{#<form action="{{ url_for('stop_it') }}" method="POST">#}
+{#    <input type="submit" value="ABORT" style="font-size: xx-large; color: red">#}
+{#</form>#}
+{##}
+{#<form action="{{ url_for('follow_stop') }}" method="POST">#}
+{#    <input type="submit" value="Stop Following">#}
+{#</form>#}
+{#<form action="{{ url_for('follow') }}" method="POST">#}
+{#    <input type="submit" value="Start Following">#}
+{#</form>#}
+{##}
+{#<form action="{{ url_for('takeoff') }}" method="POST">#}
+{#    <input type="submit" value="TAKE OFF">#}
+{#</form>#}
+{#<form action="{{ url_for('connect') }}" method="POST">#}
+{#    <input type="submit" value="CONNECT">#}
+{#</form>#}
+{#<form action="{{ url_for('disconnect') }}" method="POST">#}
+{#    <input type="submit" value="DISCONNECT">#}
+{#</form>#}
 
-<form action="{{ url_for('follow_stop') }}" method="POST">
-    <input type="submit" value="Stop Following">
-</form>
-<form action="{{ url_for('follow') }}" method="POST">
-    <input type="submit" value="Start Following">
-</form>
+<script type="text/javascript">
+    function abort() {
+        fetch("/abort", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
 
-<form action="{{ url_for('takeoff') }}" method="POST">
-    <input type="submit" value="TAKE OFF">
-</form>
-<form action="{{ url_for('connect') }}" method="POST">
-    <input type="submit" value="CONNECT">
-</form>
-<form action="{{ url_for('disconnect') }}" method="POST">
-    <input type="submit" value="DISCONNECT">
-</form>
+    function follow() {
+        fetch("/follow", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    function stop_follow() {
+        fetch("/follow_stop", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    function connect() {
+        fetch("/connect", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    function disconnect() {
+        fetch("/disconnect", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    function takeoff() {
+        fetch("/takeoff", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    // FIXME: this function -> GET '/' for some reason ???
+    function change() {
+        fetch("/change_rel_coords", {
+            method: 'POST',
+            /*body: JSON.stringify({
+                'new_x': document.getElementById('new_x').value,
+                'new_y': document.getElementById('new_y').value
+            })*/
+        }).then(res => alert('ok!')).catch(res => alert(res))
+    }
+
+    // TODO: add function for each button
+
+</script>
 
 </body>
 </html>
