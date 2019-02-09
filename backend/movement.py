@@ -12,8 +12,6 @@ class DroneNotConnectedException(DroneException):
 
 
 class FollowingDrone(Bebop):
-    drone = None
-
     # Position of the car in relation to the drone.
     # Each value in range -1 to 1
     # User properties here to avoid setting to values outside [-1,1]
@@ -148,6 +146,10 @@ class FollowingDrone(Bebop):
         self.smart_sleep(time_length)
 
     def move(self, vertical_movement):
+        """
+
+        :param vertical_movement: vertical speed as a percentage of maximum vertical speed
+        """
         if not self.drone_connection.is_connected:
             raise DroneNotConnectedException("Disconnected while moving")
         if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
@@ -183,7 +185,7 @@ class FollowingDrone(Bebop):
             if self.stop_following:
                 break
             if self.car_unknown:
-                self.lost_car()
+                self.find_car()
                 continue
             if not self.drone_connection.is_connected:
                 raise DroneNotConnectedException("Drone disconnected while following")
@@ -208,11 +210,24 @@ class FollowingDrone(Bebop):
     # Options:  fly upwards to increase field of view.
     #           Raise the angle of the camera slightly and spin around to find it
     #               Then gradually return the camera to its original vertically down angle.
-    def lost_car(self):
-        # First step: become stationary
+    def find_car(self, timeout: int = 5):
+        """
+
+        :param timeout: time in seconds before which we
+        """
+        # Become stationary in non-vertical axes
         self.roll = 0
         self.pitch = 0
-        self.yaw = 0
+
+        # ASSUME: car_unknown will be set to false once we are in range of the car, so this method wont be called
+        # This method is continuously called until
+
+        # Fly vertically upwards while slowly spinning
+
+        # TODO: add a check on altitude to make sure we dont go above it?
+        # TODO: experiment with vertical speed and spinning (yaw) speed
+        self.yaw = 5
+        self.move(3)  # set vertical speed to 3% of max vertical speed
 
 
 if __name__ == "__main__":
