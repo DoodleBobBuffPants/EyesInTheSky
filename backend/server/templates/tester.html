@@ -43,7 +43,8 @@
                     <input class="form-control" id="new_y" name="new_y" placeholder="relative x"/>
                 </div>
                 <div class="col">
-                    <button id="change" class="btn btn-primary btn-block" onclick="change()">change relative coords</button>
+                    <button id="change" class="btn btn-primary btn-block" onclick="change()">change relative coords
+                    </button>
                 </div>
             </div>
         </div>
@@ -78,42 +79,52 @@
 </div>
 
 <script type="text/javascript">
+
+
+    function post(url, body = {}) {
+        console.log("");
+        console.log("POST to ", url, " with ", body);
+        fetch(url, {
+            method: 'POST', body: JSON.stringify(body), headers: {'Content-Type': 'application/json'},
+        })
+            .then(res => {
+                console.log(res.status);
+                res.json().then(data => console.log(data))
+            })
+            .catch(err => console.log(err))
+    }
+
     function abort() {
-        fetch("/abort", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/abort')
     }
 
     function follow() {
-        fetch("/follow", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/follow')
     }
 
     function stop_follow() {
-        fetch("/follow_stop", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/stop_follow')
     }
 
     function connect() {
-        fetch("/connect", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/connect')
     }
 
     function disconnect() {
-        fetch("/disconnect", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/disconnect')
     }
 
     function takeoff() {
-        fetch("/takeoff", {method: 'POST'}).then(res => alert('ok!')).catch(res => alert(res))
+        post('/takeoff')
     }
 
-    // FIXME: this function -> GET '/' for some reason ???
     function change() {
-        fetch("/change_rel_coords", {
-            method: 'POST',
-            /*body: JSON.stringify({
-                'new_x': document.getElementById('new_x').value,
-                'new_y': document.getElementById('new_y').value
-            })*/
-        }).then(res => alert('ok!')).catch(res => alert(res))
+        post("/change_rel_coords", {
+            'new_x': document.getElementById('new_x').value,
+            'new_y': document.getElementById('new_y').value
+        })
     }
 
-    // TODO: add function for each button
 
 </script>
 

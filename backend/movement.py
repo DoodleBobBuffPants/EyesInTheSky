@@ -7,7 +7,10 @@ class DroneException(Exception):
     pass
 
 
-# TODO: subclass from pyparrot.bebop
+class DroneNotConnectedException(DroneException):
+    pass
+
+
 class FollowingDrone(Bebop):
     drone = None
 
@@ -94,10 +97,11 @@ class FollowingDrone(Bebop):
         # Must make sure the camera is always pointing down - even when the drone is at an angle
 
     def takeoff(self):
-        if self.connected:
+        # TODO: combine connected and connection.is_connected, redundant
+        if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
         else:
-            raise DroneException("Not connected")
+            raise DroneNotConnectedException("Drone not connected yet")
 
     # One option for updating the coordinates of the car's relative position.
     # Can be called by the image recognition area.
@@ -142,13 +146,15 @@ class FollowingDrone(Bebop):
 
     def sleep(self, time_length):
         self.smart_sleep(time_length)
-        self.calculate_speed(2)
 
     def move(self, vertical_movement):
+        if not self.drone_connection.is_connected:
+            raise DroneNotConnectedException("Disconnected while moving")
         if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
             self.flat_trim(0)
         else:
-            self.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=int(vertical_movement), duration=self.movement_gap)
+            self.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=int(vertical_movement),
+                            duration=self.movement_gap)
 
     def hover(self):
         self.pitch = 0
@@ -179,6 +185,8 @@ class FollowingDrone(Bebop):
             if self.car_unknown:
                 self.lost_car()
                 continue
+            if not self.drone_connection.is_connected:
+                raise DroneNotConnectedException("Drone disconnected while following")
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
 

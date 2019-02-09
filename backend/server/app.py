@@ -1,6 +1,6 @@
 from threading import Thread
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 
 from backend import movement
 
@@ -13,7 +13,10 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 # sending requests TODO: change this so it is better
 # This also connects to the drone as soon as the server starts
 # TODO: might be better to have a separate connect button on interface ???
-drone = movement.FollowingDrone()  # Create a single drone object on server
+if app.debug:
+    drone = movement.FollowingDrone()  # Create a single drone object on server
+else:
+    drone = movement.FollowingDrone(num_retries=0)  # Create a single drone object on server
 
 
 @app.route('/')
@@ -23,61 +26,50 @@ def home():
 
 @app.route('/change_rel_coords', methods=['POST'])
 def change():
-    try:
-        x = request.form["new_x"]
-        y = request.form["new_y"]
+    x = request.json["new_x"]
+    y = request.json["new_y"]
+    drone.car_rel_x = float(x)
+    drone.car_rel_y = float(y)
 
-        print(x, y)
-        drone.car_rel_x = float(x)
-        drone.car_rel_y = float(y)
-    except Exception as e:
-        print(str(e))
-        flash(str(e))
-    return redirect(url_for('home'))
+    return jsonify({})
 
 
 @app.route('/takeoff', methods=['POST'])
 def takeoff():
-    drone.takeoff()
-    return redirect(url_for('home'))
+    if not (drone.connected or drone.drone_connection.is_connected):
+        return jsonify(message="Drone not Connected"), 500
+    return jsonify(command_sent=drone.takeoff())
 
 
 @app.route('/abort', methods=['POST'])
 def stop_it():
     """ Lands drone in emergency, doesn't disconnect"""
     drone.immediate_land()
-    return redirect(url_for('home'))
+    return jsonify({})
 
 
 @app.route('/connect', methods=['POST'])
 def connect():
-    if not drone.connected:
-        drone.connect(10)
-    return redirect(url_for('home'))
+    if drone.connected or drone.drone_connection.is_connected:
+        return jsonify(message="Drone already connected"), 500
+    return jsonify(connected=drone.connect(10))
 
 
 @app.route('/disconnect', methods=['POST'])
 def disconnect():
     if drone.connected:
         drone.disconnect()
-    return redirect(url_for('home'))
+    return jsonify({})
 
 
 @app.route('/follow', methods=['POST'])
 def follow():
-    try:
-        if drone is None:
-            flash("No drone yet")
-        drone.stop_following = False
-        follow_thread = Thread(target=drone.follow_car, args=[])
-        follow_thread.start()
-        follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
-        follow_thread2.start()
-
-    except Exception as e:
-        flash(str(e))
-    finally:
-        return redirect(url_for('home'))
+    drone.stop_following = False
+    follow_thread = Thread(target=drone.follow_car, args=[])
+    follow_thread.start()
+    follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
+    follow_thread2.start()
+    return jsonify({})
 
 
 @app.route('/follow_stop', methods=['POST'])
@@ -88,7 +80,14 @@ def follow_stop():
 
     # Find a way to kill the follow thread ??
     # Or maybe setting flag is sufficient
-    return redirect(url_for('home'))
+    return jsonify({})
+
+
+@app.errorhandler(Exception)
+def errors(err: Exception):
+    response = jsonify(message=str(err),
+                       status_code=500)
+    return response, 500
 
 
 if __name__ == "__main__":
