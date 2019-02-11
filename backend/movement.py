@@ -43,6 +43,7 @@ class FollowingDrone(Bebop):
     scale_factor = 0.1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
+    # TODO - this should probably be the same rate that new car coordinates are received
     movement_gap: float = 0.01
 
     # Current values of angles, from -100 to 100 (essentially a % of the set max value)
@@ -75,7 +76,7 @@ class FollowingDrone(Bebop):
     def yaw(self, x):
         _yaw = int(self.clamp(x, -100, 100))
 
-    def __init__(self, max_tilt: int = 5, max_height: int = 1, num_retries: int = 10):
+    def __init__(self, max_tilt: int = 5, max_height: int = 1, max_rotation_speed : int = 300, num_retries: int = 10):
         """
         :param max_tilt: maximum tilt angle, related to max speed
         :param max_height: height in metres
@@ -89,10 +90,11 @@ class FollowingDrone(Bebop):
 
         # Set safety limits
         if self.connected:
-            self.set_max_tilt(max_tilt)  # proxy for max speed
-            self.set_max_altitude(max_height)  # in metres
+            self.set_max_tilt(max_tilt)             # proxy for max speed
+            self.set_max_altitude(max_height)       # in metres
+            self.set_max_tilt_rotation_speed(max_rotation_speed)   # degrees/s
 
-        # Must make sure the camera is always pointing down - even when the drone is at an angle
+        # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
     def takeoff(self):
         # TODO: combine connected and connection.is_connected, redundant
@@ -152,6 +154,7 @@ class FollowingDrone(Bebop):
         """
         if not self.drone_connection.is_connected:
             raise DroneNotConnectedException("Disconnected while moving")
+        # TODO - Wait until has been at 0 for a few time periods?
         if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
             self.flat_trim(0)
         else:
@@ -164,6 +167,7 @@ class FollowingDrone(Bebop):
         self.yaw = 0
         self.flat_trim(0)
 
+    # TODO - delete / move this to a testing function file
     def slowdown(self, x, duration):
         print([i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, -int(100 * x))])
         for i in [i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, - int(100 * x))]:
@@ -194,12 +198,20 @@ class FollowingDrone(Bebop):
 
             # v. naive
             # could be replaced by more sophisticated algorithm e.g. PID
+
+            # Travel in right direction, and turn to face car at the same time
+            # Spin quickly so that drone flies forwards as much as possible
             self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
 
+            # Divide by pi to get value in range -1 -to 1
+            # TODO - make sure this gets tested... May need quicker rotation than this
+            self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
+
+
+            # TODO - move vertical movement to a global variable??
             self.move(0)
 
-            # TODO: Could use move_relative here using drone's GPS ???
 
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
@@ -219,6 +231,8 @@ class FollowingDrone(Bebop):
         self.roll = 0
         self.pitch = 0
 
+        # TODO - add a pause to allow the drone to set_flat_trim?
+
         # ASSUME: car_unknown will be set to false once we are in range of the car, so this method wont be called
         # This method is continuously called until
 
@@ -226,6 +240,7 @@ class FollowingDrone(Bebop):
 
         # TODO: add a check on altitude to make sure we dont go above it?
         # TODO: experiment with vertical speed and spinning (yaw) speed
+        # TODO : experiment with raising the camera angle to see more area
         self.yaw = 5
         self.move(3)  # set vertical speed to 3% of max vertical speed
 
