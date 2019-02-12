@@ -40,7 +40,7 @@ class FollowingDrone(Bebop):
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 0.1
+    scale_factor = 1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
@@ -58,7 +58,7 @@ class FollowingDrone(Bebop):
 
     @roll.setter
     def roll(self, x):
-        _roll = int(self.clamp(x, -100, 100))
+        self._roll = int(self.clamp(x, -100, 100))
 
     @property
     def pitch(self):
@@ -66,7 +66,7 @@ class FollowingDrone(Bebop):
 
     @pitch.setter
     def pitch(self, x):
-        _pitch = int(self.clamp(x, -100, 100))
+        self._pitch = int(self.clamp(x, -100, 100))
 
     @property
     def yaw(self):
@@ -74,7 +74,7 @@ class FollowingDrone(Bebop):
 
     @yaw.setter
     def yaw(self, x):
-        _yaw = int(self.clamp(x, -100, 100))
+        self._yaw = int(self.clamp(x, -100, 100))
 
     def __init__(self, max_tilt: int = 5, max_height: int = 1, max_rotation_speed: int = 300, num_retries: int = 10):
         """
@@ -96,7 +96,7 @@ class FollowingDrone(Bebop):
 
         # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
-    def takeoff(self):
+    def atakeoff(self):
         # TODO: combine connected and connection.is_connected, redundant
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
@@ -201,13 +201,15 @@ class FollowingDrone(Bebop):
 
             # Travel in right direction, and turn to face car at the same time
             # Spin quickly so that drone flies forwards as much as possible
+            print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
             self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
 
             # Divide by pi to get value in range -1 -to 1
             # TODO - make sure this gets tested... May need quicker rotation than this
             self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
-
+            print(self.car_rel_x, self.car_rel_y)
+            print(self.pitch, self.roll, self.yaw)
             # TODO - move vertical movement to a global variable??
             self.move(0)
 
