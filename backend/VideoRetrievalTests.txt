@@ -4,3 +4,11 @@ Tested multi-threading
 				Success
 Tested ability to use video stream in new thread
 				Success
+Tested passing the URL of the drone's connection to player
+				Fail - further tests conducted in player
+Tested starting the player and receiving video
+				Success but jittery images
+Tested modified resolution and FPS to obtain stable images for processing
+				Success
+Tested passing of drone object bebop to player to reduce video latency
+				- 

@@ -1,3 +1,4 @@
+bitstring
 flask
 filelock==3.0.10
 ifaddr==0.1.6

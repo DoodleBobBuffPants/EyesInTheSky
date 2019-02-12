@@ -13,3 +13,16 @@ Tested FileLock
 			Successfull locking
 Tested custom locking implementation
 			Works for our purpose
+Tested playing the drone's stream from port directly
+			Failed as drone doesn't support RTSP so needs an SDP config file
+Tested playing the drone's stream using sdp file
+			Connects but protocol issue as opencv has them unlisted
+Tested playing the drone's stream after whitelisting necessary protocols in environment variables
+			Can successfully connect to stream and port but timeout before playing
+Tested playing the drone's stream
+			Successfully accepts and plays the drone's video stream
+Tested latency reduction techniques
+			Success
+Tested more threading
+			Failure as it seems more threading doesn't decrease latency beyond one thread (tested increasing threads by doubling and 
+			infact get increased latency after 4 threads)

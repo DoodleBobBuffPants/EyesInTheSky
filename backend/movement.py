@@ -76,7 +76,7 @@ class FollowingDrone(Bebop):
     def yaw(self, x):
         _yaw = int(self.clamp(x, -100, 100))
 
-    def __init__(self, max_tilt: int = 5, max_height: int = 1, max_rotation_speed : int = 300, num_retries: int = 10):
+    def __init__(self, max_tilt: int = 5, max_height: int = 1, max_rotation_speed: int = 300, num_retries: int = 10):
         """
         :param max_tilt: maximum tilt angle, related to max speed
         :param max_height: height in metres
@@ -90,9 +90,9 @@ class FollowingDrone(Bebop):
 
         # Set safety limits
         if self.connected:
-            self.set_max_tilt(max_tilt)             # proxy for max speed
-            self.set_max_altitude(max_height)       # in metres
-            self.set_max_tilt_rotation_speed(max_rotation_speed)   # degrees/s
+            self.set_max_tilt(max_tilt)  # proxy for max speed
+            self.set_max_altitude(max_height)  # in metres
+            self.set_max_tilt_rotation_speed(max_rotation_speed)  # degrees/s
 
         # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
@@ -208,10 +208,8 @@ class FollowingDrone(Bebop):
             # TODO - make sure this gets tested... May need quicker rotation than this
             self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
 
-
             # TODO - move vertical movement to a global variable??
             self.move(0)
-
 
             # Care using time.sleep or drone.safe_sleep()
             # Check pyparrot documentation for this
