@@ -2,17 +2,17 @@ function CarFilter()
     % MAIN PROGRAM
     obj = setupSysObjs(); %objects for IO, object detection
     
-    filterParams = getDefaultParams(); %params for Kalman Filter
-    carTrack = createFirstTrack(filterParams); %Setup initial car location
-
-    %flag for if we are still reliably tracking the car
+    %flags for if we are still reliably tracking the car
     isDetected = true;
     isLost = false;
+    
+    filterParams = getDefaultParams(); %params for Kalman Filter
+    carTrack = createFirstTrack(filterParams); %Setup initial car location
     
     % Detect moving objects, and track them across video frames.
     while ~isDone(obj.reader) %while video stream exists
         frame = readFrame();
-        [centroids, bboxes, mask] = detectObjects(frame); %detect objs in this frame
+        [centroids, bboxes, mask] = detectObjects(frame);
 
         predictTracks();
         [assignments, unassignedDetections, costs] = detectionToTrackAssignment();
@@ -27,6 +27,8 @@ function CarFilter()
                 carTrack.consecutiveInvisibleCount + 1;
 
             %Determine if we have lost the car based on how long its been invisible for
+            %TODO try to keep track of car if we cannot see it because it
+            %is stationary.
             timeThresh = 30;
             if carTrack.consecutiveInvisibleCount >= timeThresh
                 isLost = true;
@@ -40,8 +42,21 @@ function CarFilter()
                 bbox = bboxes(detectionIdx, :);         %find assoc. bbox
                 % Correct the object's location using the new detection.
                 correct(carTrack.kalmanFilter, centroid);
-                % Replace predicted bounding box with detected bounding box.
-                %TODO slow growth
+                
+                % Replace predicted bounding box with detected bounding
+                % box, limiting growth of the size and adjusting center to
+                % compensate
+                growthRate = 1.05;
+                maxWidth = growthRate * carTrack.bbox(3);
+                maxHeight = growthRate * carTrack.bbox(4);
+                if bbox(3)>maxWidth
+                   %bbox(1) = ((2*bbox(3) - maxWidth)/bbox(3)) * bbox(1);
+                   bbox(3) = maxWidth;
+                end
+                if bbox(4)>maxHeight
+                   %bbox(2) = ((2*bbox(4) - maxHeight)/bbox(4)) * bbox(2);
+                   bbox(4) = maxHeight;
+                end
                 carTrack.bbox = bbox;
 
                 % Update visibility
@@ -109,24 +124,24 @@ function CarFilter()
     %KALMAN FILTER FUNCTIONS
     %Default parameters for setup
     function filterParams = getDefaultParams
-        %choose from ConstantAcceleration, ConstantVelocity
-        %TODO test with car. Each is better in different tests
+        %choose from [ConstantAcceleration], ConstantVelocity
+        %CA better for the car model.
         filterParams.motionModel = 'ConstantAcceleration';
         %filterParams.initLocation = TODO link with car detection
         filterParams.initError = 1E5 * ones(1, 3); %error in first location
         %noise for position, velocity, acceleration
-        filterParams.motionNoise = [25, 10, 1];
+        filterParams.motionNoise = [25, 10,1];
         %Estimated inaccuracy in measuring
-        filterParams.measurementNoise = 250;
+        filterParams.measurementNoise = 125;
         %theshold for detecting object: large may miss, small v noisy
         filterParams.segmentationThreshold = 0.05;
     end
     %create track for initial object
     function carTrack = createFirstTrack(filterParams)
         %TODO get from detector code
-        startLoc = [300,300];
-        bbox = [startLoc,50,10]; %bbox format: center, width, height
-        filterParams.initError = ones(1,3);
+        startLoc = [0,0];
+        bbox = [startLoc,10,10]; %bbox format: center, width, height
+        filterParams.initError = ones(1,3);                                 %replace 3 with 2 for velocity model
 
         % Create a Kalman filter object.
         kalmanFilter = configureKalmanFilter(filterParams.motionModel, ...
@@ -164,10 +179,9 @@ function CarFilter()
             'NumTrainingFrames', 40, 'MinimumBackgroundRatio', 0.7);
 
         %System to detect properties of moving objects
-        
         obj.blobAnalyser = vision.BlobAnalysis('BoundingBoxOutputPort', true, ...
             'AreaOutputPort', true, 'CentroidOutputPort', true, ...
-            'MinimumBlobArea', 900);%TODO mess with blob area param
+            'MinimumBlobArea', 2500);
     end
     %advance video feed
     function frame = readFrame()
