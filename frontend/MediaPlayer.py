@@ -14,6 +14,7 @@ def playVid(vidpath, bebop):
     fgProc = Thread(target=fg.frameGetter, args=[queue, bebop, vidpath])
     fgProc.start()
     # loop through each frame, making hand over for analysis easier
+    print("playvid")
     while True:
         # read frame
         frame = queue.get()
