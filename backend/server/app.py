@@ -3,6 +3,7 @@ from threading import Thread
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 
 from backend import movement
+from frontend import MediaPlayer
 
 app = Flask(__name__)
 
@@ -13,10 +14,8 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 # sending requests TODO: change this so it is better
 # This also connects to the drone as soon as the server starts
 # TODO: might be better to have a separate connect button on interface ???
-if app.debug:
-    drone = movement.FollowingDrone()  # Create a single drone object on server
-else:
-    drone = movement.FollowingDrone(num_retries=10)  # Create a single drone object on server
+
+drone = movement.FollowingDrone(num_retries=10)  # Create a single drone object on server
 
 
 @app.route('/')
@@ -68,8 +67,21 @@ def follow():
     drone.stop_following = False
     follow_thread = Thread(target=drone.follow_car, args=[])
     follow_thread.start()
-    #follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
-    #follow_thread2.start()
+    # follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
+    # follow_thread2.start()
+    return jsonify({})
+
+
+@app.route('/video_start', methods=['POST'])
+def video():
+    drone.set_video_resolutions("rec1080_stream480")
+    drone.set_video_framerate("24_FPS")
+
+    # start video stream as separate process as it is blocking
+    vidPath = "../../frontend/bebop.sdp"
+    streamProc = Thread(target=MediaPlayer.playVid, args=[vidPath, drone])
+    streamProc.start()
+    streamProc.join()
     return jsonify({})
 
 
