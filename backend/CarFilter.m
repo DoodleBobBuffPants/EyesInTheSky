@@ -46,7 +46,7 @@ function CarFilter()
                 % Replace predicted bounding box with detected bounding
                 % box, limiting growth of the size and adjusting center to
                 % compensate
-                growthRate = 1.05;
+                growthRate = 1.1;
                 maxWidth = growthRate * carTrack.bbox(3);
                 maxHeight = growthRate * carTrack.bbox(4);
                 if bbox(3)>maxWidth
@@ -138,7 +138,8 @@ function CarFilter()
     end
     %create track for initial object
     function carTrack = createFirstTrack(filterParams)
-        %TODO get from detector code
+        %At start, car will not be detected. Need to classify detections
+        %later.
         startLoc = [0,0];
         bbox = [startLoc,10,10]; %bbox format: center, width, height
         filterParams.initError = ones(1,3);                                 %replace 3 with 2 for velocity model
@@ -166,7 +167,7 @@ function CarFilter()
         addpath(strcat(pwd,'/TrainingData'));
         % Create a video file reader.
         %TODO link to drone video feed
-        obj.reader = vision.VideoFileReader('data1.mp4');                 %DATA INPUT DEFINED HERE
+        obj.reader = vision.VideoFileReader('data3.mp4');                 %DATA INPUT DEFINED HERE
         
         %TODO DEMO ONLY
         % Create two video players, one to display the video,
