@@ -6,6 +6,7 @@ Requirements:
 - zeroconf
 - opencv (and FFmpeg)
 - filelock (for more reliable, non naive locking)
+- MATLAB
 
 Required environment variable:
 	OPENCV_FFMPEG_CAPTURE_OPTIONS = protocol_whitelist;file,rtp,udp
