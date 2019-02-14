@@ -1,8 +1,7 @@
 # read frames using opencv and display frames as a video
 import cv2 as cv
 from threading import Thread
-# from queue import Queue
-import backend.Lock as lock  # custom naive lock
+import backend.FrameHandler as FH
 import frontend.FrameGetter as fg
 from frontend import Queue
 
@@ -10,6 +9,7 @@ from frontend import Queue
 def playVid(vidpath, bebop):
     # queue of frames
     queue = Queue.Queue()
+    fh = FH.FrameHandler()
     # new thread to get frames concurrently
     fgProc = Thread(target=fg.frameGetter, args=[queue, bebop, vidpath])
     fgProc.daemon = True
@@ -20,9 +20,7 @@ def playVid(vidpath, bebop):
         frame = queue.get()
         cv.imshow('Video', frame)
         # synchronised write out of frame for concurrency control during analysis
-        lock.take_lock()
-        cv.imwrite("frame.jpg", frame)
-        lock.release_lock()
+        fh.writeFrame(frame)
         if cv.waitKey(1) == ord('q'):
         	# release resources
         	cv.destroyAllWindows()
