@@ -1,5 +1,5 @@
 # test for custom thread-safe queue
-import Queue 				 	# custom queue
+import frontend.Queue 				 	# custom queue
 from threading import Thread 	# prod/cons threads
 
 # initialise queue and counter
