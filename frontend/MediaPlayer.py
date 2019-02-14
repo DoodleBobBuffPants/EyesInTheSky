@@ -12,6 +12,7 @@ def playVid(vidpath, bebop):
     queue = Queue.Queue()
     # new thread to get frames concurrently
     fgProc = Thread(target=fg.frameGetter, args=[queue, bebop, vidpath])
+    fgProc.daemon = True
     fgProc.start()
     # loop through each frame, making hand over for analysis easier
     while True:
@@ -22,7 +23,7 @@ def playVid(vidpath, bebop):
         lock.take_lock()
         cv.imwrite("frame.jpg", frame)
         lock.release_lock()
-        cv.waitKey(1)
-    # release resources
-    vc.release()
-    cv.destroyAllWindows()
+        if cv.waitKey(1) == ord('q'):
+        	# release resources
+        	cv.destroyAllWindows()
+        	break

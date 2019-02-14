@@ -28,3 +28,7 @@ Tested more threading
 			infact get increased latency after 4 threads)
 Tested cutstom queue implementation and correct functionality
 			Success
+Tested successful closing of media player on input 'q'
+			Fail as frame getter still active
+Tested successful closing by setting frame getter as daemon thread
+			Success
