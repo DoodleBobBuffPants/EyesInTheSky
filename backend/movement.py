@@ -188,6 +188,7 @@ class FollowingDrone(Bebop):
         while True:
             if self.stop_following:
                 break
+            # TODO - This calls find_car too many times
             if self.car_unknown:
                 self.find_car()
                 continue

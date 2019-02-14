@@ -26,3 +26,5 @@ Tested latency reduction techniques
 Tested more threading
 			Failure as it seems more threading doesn't decrease latency beyond one thread (tested increasing threads by doubling and 
 			infact get increased latency after 4 threads)
+Tested cutstom queue implementation and correct functionality
+			Success
