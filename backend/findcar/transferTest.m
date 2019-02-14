@@ -7,17 +7,18 @@ numClasses = 2;
 
 layers = [
     layersTransfer
-    fullyConnectedLayer(numClasses,'WeightLearnRateFactor',20,'BiasLearnRateFactor',20)
+    fullyConnectedLayer(numClasses,'WeightLearnRateFactor',50,'BiasLearnRateFactor',30)
     softmaxLayer
-    classificationLayer];
+    classificationLayer
+ ];
 
 options = trainingOptions('sgdm', ...
-    'MiniBatchSize',128, ...
-    'MaxEpochs',8, ...
-    'InitialLearnRate',1e-4, ...
+    'MiniBatchSize',168, ...
+    'MaxEpochs',9, ...
+    'InitialLearnRate',5e-4, ...
     'Shuffle','every-epoch', ...
     'ValidationData',auimdsValidation, ...
-    'ValidationFrequency',2, ...
+    'ValidationFrequency',3, ...
     'Verbose',false, ...
     'Plots','training-progress');
 
@@ -28,14 +29,19 @@ netTransfer = trainNetwork(auimds,layers,options);
 YValidation = unauimdsValidation.Labels;
 accuracy = mean(YPred == YValidation);
 
-idx = randperm(numel(unauimdsValidation.Files),10);
+
+save carNet;
+
+
 figure
-for i = 1:10
+for i = 1:14
     subplot(4,4,i)
-    I = readimage(unauimdsValidation,idx(i));
+    I = readimage(unauimdsValidation,i);
     imshow(I)
-    label = YPred(idx(i));
+    label = scores(i);
+    disp(scores(i));
     title(string(label));
 end
+
 
 
