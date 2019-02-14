@@ -13,3 +13,5 @@ Required environment variable:
 Do `pip install -r requirements.txt` to install all requirements
 
 The MIT license covers use of the pyparrot library.
+
+SDP files need to be configured locally because IP addresses differ.
