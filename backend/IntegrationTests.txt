@@ -1,0 +1,4 @@
+Test that video player works when started from web server backend
+				Fail - possibly a path error
+Test that video player works once path errors were corrected
+				Success (successful merge between video retrieval and drone movement)

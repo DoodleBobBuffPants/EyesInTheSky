@@ -1,13 +1,10 @@
 from threading import Thread
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
-
 from backend import movement
 from frontend import MediaPlayer
 
 app = Flask(__name__)
 
-# TODO: INSECURE, change this to get from a hidden config file
 app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17\xf3\xd1'
 
 # Global-ish drone variable, this will only work when the server runs on a single thread and there is one user
@@ -29,7 +26,6 @@ def change():
     y = request.json["new_y"]
     drone.car_rel_x = float(x)
     drone.car_rel_y = float(y)
-
     return jsonify({})
 
 
@@ -78,10 +74,9 @@ def video():
     drone.set_video_framerate("24_FPS")
 
     # start video stream as separate process as it is blocking
-    vidPath = "../../frontend/bebop.sdp"
+    vidPath = "frontend/bebop.sdp"
     streamProc = Thread(target=MediaPlayer.playVid, args=[vidPath, drone])
     streamProc.start()
-    streamProc.join()
     return jsonify({})
 
 
