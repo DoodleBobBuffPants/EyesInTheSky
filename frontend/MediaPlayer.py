@@ -1,7 +1,7 @@
 # read frames using opencv and display frames as a video
 import cv2 as cv
 from threading import Thread
-import frontend.Lock
+import frontend.Lock as Lock
 import frontend.FrameGetter as fg
 from frontend import Queue
 
@@ -29,7 +29,7 @@ class MediaPlayer:
             cv.imshow('Video', frame)
             # synchronised write out of frame for concurrency control during analysis
             self.lock.take_lock()
-            cv.imWrite(frame)
+            cv.imwrite("frame.jpg", frame)
             self.lock.release_lock()
             if cv.waitKey(1) == ord('q'):
             	# release resources
