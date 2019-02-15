@@ -5,6 +5,9 @@ from frontend import MediaPlayer
 
 app = Flask(__name__)
 
+# media player object for new thread
+mp = MediaPlayer.MediaPlayer()
+
 app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17\xf3\xd1'
 
 # Global-ish drone variable, this will only work when the server runs on a single thread and there is one user
@@ -75,7 +78,7 @@ def video():
 
     # start video stream as separate process as it is blocking
     vidPath = "frontend/bebop.sdp"
-    streamProc = Thread(target=MediaPlayer.playVid, args=[vidPath, drone])
+    streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
     streamProc.start()
     return jsonify({})
 
@@ -97,6 +100,9 @@ def errors(err: Exception):
                        status_code=500)
     return response, 500
 
+# can get a reference to the frame.jpg lock
+def getFrameLock():
+    mp.getLock()
 
 if __name__ == "__main__":
     app.run()
