@@ -170,7 +170,7 @@ class FollowingDrone(Bebop):
     # TODO - delete / move this to a testing function file
     def slowdown(self, x, duration):
         print([i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, -int(100 * x))])
-        for i in [i * 0.01 for i in range(int(10000 * x), -int(10000 * x) - 1, - int(100 * x))]:
+        for i in [i * 0.01 for i in range(int(10000 * x), -1, - int(100 * x))]:
             print("i: ", i)
             self.car_rel_x = i
             self.car_rel_y = i
@@ -208,7 +208,7 @@ class FollowingDrone(Bebop):
 
             # Divide by pi to get value in range -1 -to 1
             # TODO - make sure this gets tested... May need quicker rotation than this
-            self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
+            #self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
             print(self.car_rel_x, self.car_rel_y)
             print(self.pitch, self.roll, self.yaw)
             # TODO - move vertical movement to a global variable??

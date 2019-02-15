@@ -66,8 +66,8 @@ def follow():
     drone.stop_following = False
     follow_thread = Thread(target=drone.follow_car, args=[])
     follow_thread.start()
-    # follow_thread2 = Thread(target=drone.slowdown, args=[0.01, 2])
-    # follow_thread2.start()
+    follow_thread2 = Thread(target=drone.slowdown, args=[0.1, 2])
+    follow_thread2.start()
     return jsonify({})
 
 
