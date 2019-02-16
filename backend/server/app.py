@@ -75,6 +75,7 @@ def follow():
 def video():
     drone.set_video_resolutions("rec1080_stream480")
     drone.set_video_framerate("24_FPS")
+    drone.set_video_stream_mode("high_reliability_low_framerate")
 
     # start video stream as separate process as it is blocking
     vidPath = "frontend/bebop.sdp"

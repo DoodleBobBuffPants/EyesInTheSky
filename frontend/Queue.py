@@ -5,9 +5,10 @@ import frontend.Lock as Lock  # lock to handle synchronisation
 class Queue:
 
     # initialise buffer
-    def __init__(self):
+    def __init__(self, size=100):
         self.buf = []
         self.lock = Lock.Lock()
+        self.maxsize = size
 
     # return an item if there is one
     def get(self):
@@ -21,6 +22,8 @@ class Queue:
 
     # put an item at the end of the list
     def put(self, item):
+        while len(self.buf) > self.maxsize:
+            pass
         self.lock.take_lock()
         self.buf = self.buf + [item]
         self.lock.release_lock()

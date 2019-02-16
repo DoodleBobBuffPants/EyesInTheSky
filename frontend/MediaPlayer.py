@@ -19,6 +19,7 @@ class MediaPlayer:
         # queue of frames
         queue = Queue.Queue()
         # new thread to get frames concurrently
+        bebop.start_video_stream()
         fgProc = Thread(target=fg.frameGetter, args=[queue, bebop, vidpath])
         fgProc.daemon = True
         fgProc.start()
@@ -31,7 +32,8 @@ class MediaPlayer:
             self.lock.take_lock()
             cv.imwrite("frame.jpg", frame)
             self.lock.release_lock()
-            if cv.waitKey(1) == ord('q'):
+            if cv.waitKey(2) == ord('q'):
             	# release resources
             	cv.destroyAllWindows()
+                bebop.stop_video_stream()
             	break
