@@ -5,7 +5,7 @@ import frontend.Lock as Lock  # lock to handle synchronisation
 class Queue:
 
     # initialise buffer
-    def __init__(self, size=100):
+    def __init__(self, size=200):
         self.buf = []
         self.lock = Lock.Lock()
         self.maxsize = size
