@@ -1,6 +1,0 @@
-Tested the library functionality
-				Success
-Tested multi-threading
-				Success
-Tested ability to use video stream in new thread
-				Success

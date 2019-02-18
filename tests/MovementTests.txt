@@ -1,0 +1,16 @@
+Test all server endpoints return correctly or return an error
+				Success
+Tested the emergency abort mechanism
+				Success
+Tested successful connection on server start
+				Success
+Tested disconnection on pressing disconnect button
+				Success
+Tested re-connection on pressing connect button or no change if already connected
+				Success
+Tested that a change in the relative coordinates form actually changes variables in the drone object
+				Success
+Tested the case of a constant relative position where the car is always in front of the drone, which has the drone moving at a constant speed in one direction
+				Success
+Test with several different directions that 'Stop following' makes the drone stop and hover, but not land
+				Success

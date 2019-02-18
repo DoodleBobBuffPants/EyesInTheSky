@@ -1,0 +1,34 @@
+Tested reading RTP packet manually to view video/frames
+			Non trivial task in terms of codecs and not enough information online to make this feesible in the time period required
+Tested VLC player successfully plays test video
+			Success
+Tested VLC player's web streaming capability
+			Fail (flash player error)
+			No solution found after hours of research into protocols and handling packets
+Tested FFmpeg as was recommended on forums
+			Non trivial to use
+Tested opencv's ability to play video
+			Success
+Tested FileLock
+			Successfull locking
+Tested custom locking implementation
+			Works for our purpose
+Tested playing the drone's stream from port directly
+			Failed as drone doesn't support RTSP so needs an SDP config file
+Tested playing the drone's stream using sdp file
+			Connects but protocol issue as opencv has them unlisted
+Tested playing the drone's stream after whitelisting necessary protocols in environment variables
+			Can successfully connect to stream and port but timeout before playing
+Tested playing the drone's stream
+			Successfully accepts and plays the drone's video stream
+Tested latency reduction techniques
+			Success
+Tested more threading
+			Failure as it seems more threading doesn't decrease latency beyond one thread (tested increasing threads by doubling and 
+			infact get increased latency after 4 threads)
+Tested cutstom queue implementation and correct functionality
+			Success
+Tested successful closing of media player on input 'q'
+			Fail as frame getter still active
+Tested successful closing by setting frame getter as daemon thread
+			Success

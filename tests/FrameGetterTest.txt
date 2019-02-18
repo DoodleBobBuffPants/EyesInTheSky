@@ -1,0 +1,8 @@
+Test frame getter method successfully runs in a new thread
+				Success
+Test frame getter concurrently gets threads and still allows player to display frames
+				Success
+Test for decrease in latency
+				Success, now approx < 1s delay compared to > 1s before
+Tested succesfull use with custom queue
+				Success and with a little less latency perhaps owing to naive implementation
