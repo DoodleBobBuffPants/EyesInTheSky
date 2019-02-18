@@ -3,6 +3,7 @@ import cv2 as cv
 from threading import Thread
 import frontend.Lock as Lock
 import frontend.FrameGetter as fg
+import frontend.FrameSaver as fs
 from frontend import Queue
 
 class MediaPlayer:
@@ -28,11 +29,11 @@ class MediaPlayer:
         while True:
             # read frame
             frame = queue.get()
-            cv.imshow('Video', frame)
             # synchronised write out of frame for concurrency control during analysis
             self.lock.take_lock()
             cv.imwrite("frame.jpg", frame)
             self.lock.release_lock()
+            cv.imshow('Video', frame)
             if cv.waitKey(1) == ord('q'):
             	# exit
                 break
