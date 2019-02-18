@@ -65,9 +65,11 @@ def disconnect():
 def follow():
     drone.stop_following = False
     follow_thread = Thread(target=drone.follow_car, args=[])
+    follow_thread.daemon = True
     follow_thread.start()
-    follow_thread2 = Thread(target=drone.slowdown, args=[0.1, 2])
-    follow_thread2.start()
+    # follow_thread2 = Thread(target=drone.slowdown, args=[0.1, 2])
+    # follow_thread2.daemon = True
+    # follow_thread2.start()
     return jsonify({})
 
 
@@ -75,11 +77,11 @@ def follow():
 def video():
     drone.set_video_resolutions("rec1080_stream480")
     drone.set_video_framerate("24_FPS")
-    drone.set_video_stream_mode("high_reliability_low_framerate")
 
     # start video stream as separate process as it is blocking
     vidPath = "frontend/bebop.sdp"
     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
+    streamProc.daemon = True
     streamProc.start()
     return jsonify({})
 

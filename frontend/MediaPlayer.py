@@ -12,7 +12,7 @@ class MediaPlayer:
         self.lock = Lock.Lock()
 
     # get lock reference
-    def getLock():
+    def getLock(self):
         return self.lock
 
     def playVid(self, vidpath, bebop):
@@ -33,9 +33,10 @@ class MediaPlayer:
             self.lock.take_lock()
             cv.imwrite("frame.jpg", frame)
             self.lock.release_lock()
-            if cv.waitKey(2) == ord('q'):
-            	# release resources
-                vc.release()
-            	cv.destroyAllWindows()
-                bebop.stop_video_stream()
-            	break
+            if cv.waitKey(1) == ord('q'):
+            	# exit
+                break
+        # relese resources
+        cv.destroyAllWindows()
+        vc.release()
+        bebop.stop_video_stream()

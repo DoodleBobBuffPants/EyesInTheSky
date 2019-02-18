@@ -9,14 +9,20 @@ class Queue:
         self.buf = []
         self.lock = Lock.Lock()
         self.maxsize = size
+        self.first = True
 
     # return an item if there is one
     def get(self):
         while len(self.buf) == 0:
             pass
         self.lock.take_lock()
-        ret = self.buf[0]
-        self.buf = self.buf[1:]
+        if self.first == False:
+            ret = self.buf[0]
+            self.buf = self.buf[1:]
+        else:
+            ret = self.buf[-1]
+            self.buf = []
+            self.first = False
         self.lock.release_lock()
         return ret
 
