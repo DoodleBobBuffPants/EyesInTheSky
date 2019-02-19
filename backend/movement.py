@@ -1,4 +1,5 @@
 from pyparrot.Bebop import Bebop
+import backend.Point as Point
 import math
 import time
 
@@ -82,6 +83,9 @@ class FollowingDrone(Bebop):
         :param max_height: height in metres
         """
         super().__init__()
+
+        # create shared point object to store coordinates
+        self.point = Point.Point()
 
         # Should scaling mechanism be proportional to height of drone?
         # Should we set scale here?
@@ -244,6 +248,11 @@ class FollowingDrone(Bebop):
         # TODO : experiment with raising the camera angle to see more area
         self.yaw = 5
         self.move(3)  # set vertical speed to 3% of max vertical speed
+
+    # update point object to set new coords in a thread-safe manner
+    def updatePoint(self, nx, ny):
+        self.point.set(nx, ny)
+        self._car_rel_x, self._car_rel_y = self.point.get()
 
 
 if __name__ == "__main__":
