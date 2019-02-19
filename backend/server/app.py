@@ -1,3 +1,11 @@
+# import from parent directory
+import sys
+sys.path.append('../..')
+
+# set environment variable
+import os
+os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
+
 from threading import Thread
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 from backend import movement
@@ -79,7 +87,7 @@ def video():
     drone.set_video_framerate("24_FPS")
 
     # start video stream as separate process as it is blocking
-    vidPath = "frontend/bebop.sdp"
+    vidPath = "bebop.sdp"
     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
     streamProc.daemon = True
     streamProc.start()
