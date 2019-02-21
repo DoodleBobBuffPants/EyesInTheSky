@@ -45,7 +45,6 @@ classdef CarFilterFrame < handle
 	        [CF.centroids, CF.bboxes, CF.mask] = detectObjects(CF, CF.frame);
 	       	CF.framenumber = CF.framenumber +1
 	       	disp([CF.framenumber])
-            disp()
 
 	        predictTracks(CF);
 	        [assignments, unassignedDetections, costs] = detectionToTrackAssignment(CF, CF.centroids);

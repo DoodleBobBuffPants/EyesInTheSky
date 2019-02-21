@@ -11,6 +11,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from backend import movement
 from frontend import MediaPlayer
 import platform
+import backend.CallCarFilter as cf
 
 app = Flask(__name__)
 
@@ -99,12 +100,16 @@ def video():
         streamProc.daemon = True
         streamProc.start()
         
-        cfProc = Thread(target=cf.call_car_filter, args=[drone])
+        cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
         cfProc.daemon = True
         cfProc.start()
 
     else:
         print("Video already running")
+
+        cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
+        cfProc.daemon = True
+        cfProc.start()
     return jsonify({})
 
 
@@ -127,7 +132,7 @@ def errors(err: Exception):
 
 # can get a reference to the frame.jpg lock
 def getFrameLock():
-    mp.getLock()
+    return mp.getLock()
 
 if __name__ == "__main__":
     app.run()

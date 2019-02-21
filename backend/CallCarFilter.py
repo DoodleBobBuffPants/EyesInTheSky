@@ -5,8 +5,9 @@
 import matlab.engine
 import cv2 as cv
 import backend.movement
+import os
 
-def call_car_filter(bebop):
+def call_car_filter(bebop, lock):
     # start the engine
     eng = matlab.engine.start_matlab()
 
@@ -35,23 +36,27 @@ def call_car_filter(bebop):
     # width, height = cv.GetSize(frame)
 
     # load frame from top-level folder
-    frame = cv.imread("../frame.jpg")
+    lock.take_lock()
+    frame = cv.imread("frame.jpg")
+    lock.release_lock()
+    print(os.getcwd())
     height, width = frame.shape[:2]
 
     # TODO: avoid copying a file so much and/or locking
     # TODO: end at some point
     while True:
-        cv.imwrite("frame_for_filter.jpg", frame)
+        cv.imwrite("backend/frame_for_filter.jpg", frame)
         # run the car filter with current frame
-        a = eng.run(cf, "frame_for_filter.jpg")
+        a = eng.run(cf, "backend/frame_for_filter.jpg")
         print("Centroids: ", a)
 
         if len(a) > 0:
             x, y = coords_from_centroid(a[0])
-            movement.update_coords(bebop, x, y)
+            # bebop.update_coords(x, y)
             print(x, y)
-        
-        frame = cv.imread("../frame.jpg")
+
+        lock.take_lock()
+        frame = cv.imread("frame.jpg")
+        lock.release_lock()
 
         # ret, frame = vc.read()
-

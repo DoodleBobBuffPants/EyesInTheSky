@@ -5,7 +5,6 @@ import frontend.Lock as Lock
 import frontend.FrameGetter as fg
 import frontend.FrameSaver as fs
 from frontend import Queue
-import backend.CallCarFilter as cf
 
 class MediaPlayer:
 
