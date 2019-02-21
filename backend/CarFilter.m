@@ -184,6 +184,7 @@ function CarFilter()
             'AreaOutputPort', true, 'CentroidOutputPort', true, ...
             'MinimumBlobArea', 2500);
     end
+    
     %advance video feed
     function frame = readFrame()
         frame = obj.reader.step();
