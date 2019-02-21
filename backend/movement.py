@@ -1,4 +1,5 @@
 from pyparrot.Bebop import Bebop
+import backend.Point as Point
 import math
 import time
 
@@ -17,6 +18,8 @@ class FollowingDrone(Bebop):
     # User properties here to avoid setting to values outside [-1,1]
     _car_rel_y: float = 0
     _car_rel_x: float = 0
+
+    finding_car : bool = False
 
     @property
     def car_rel_x(self):
@@ -83,6 +86,9 @@ class FollowingDrone(Bebop):
         """
         super().__init__()
 
+        # create shared point object to store coordinates
+        self.point = Point.Point()
+
         # Should scaling mechanism be proportional to height of drone?
         # Should we set scale here?
         # Try to connect, do nothing on connection failure to allow connection from interface
@@ -107,17 +113,20 @@ class FollowingDrone(Bebop):
     # Can be called by the image recognition area.
     # Alternatively can retrieve most up to date version of coordinates from the image recognition file.
     def update_coords(self, new_x, new_y):
+        if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
+            self.car_unknown = True
+            self.car_rel_x = 0
+            self.car_rel_y = 0
+            return
         self.car_rel_x = new_x
         self.car_rel_y = new_y
 
     # For emergency manual override
     def immediate_land(self):
-        # Go to level flight
-        self.roll = 0
-        self.pitch = 0
-        self.yaw = 0
 
         self.stop_following = True
+        time.sleep(self.movement_gap)
+        self.hover()    # Go to level flight
 
         self.safe_land(5)
 
@@ -185,16 +194,20 @@ class FollowingDrone(Bebop):
     # Initially don't use yaw. Use forward-backward and side-to-side movements.
     # Alternative : Change so that spins to face the car and then always moves forwards
     def follow_car(self):
+
         while True:
             if self.stop_following:
                 break
             # TODO - This calls find_car too many times
             if self.car_unknown:
-                self.find_car()
+                if not self.finding_car:
+                    self.finding_car = True
+                    self.find_car()
                 continue
             if not self.drone_connection.is_connected:
                 raise DroneNotConnectedException("Drone disconnected while following")
-            # Care using time.sleep or drone.safe_sleep()
+
+
             # Check pyparrot documentation for this
 
             # v. naive
@@ -202,6 +215,7 @@ class FollowingDrone(Bebop):
 
             # Travel in right direction, and turn to face car at the same time
             # Spin quickly so that drone flies forwards as much as possible
+
             print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
             self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
@@ -229,21 +243,30 @@ class FollowingDrone(Bebop):
         :param timeout: time in seconds before which we
         """
         # Become stationary in non-vertical axes
-        self.roll = 0
-        self.pitch = 0
+        self.hover()
 
-        # TODO - add a pause to allow the drone to set_flat_trim?
+        time.sleep(0.5) # Allow the drone to enter level flight
 
         # ASSUME: car_unknown will be set to false once we are in range of the car, so this method wont be called
-        # This method is continuously called until
 
         # Fly vertically upwards while slowly spinning
 
-        # TODO: add a check on altitude to make sure we dont go above it?
+        # TODO: add a check on altitude to make sure we dont go above it? - Does max altitude work
         # TODO: experiment with vertical speed and spinning (yaw) speed
         # TODO : experiment with raising the camera angle to see more area
         self.yaw = 5
-        self.move(3)  # set vertical speed to 3% of max vertical speed
+        while True:
+            if not self.car_unknown:
+                self.finding_car = False
+                break
+            self.move(3)  # set vertical speed to 3% of max vertical speed
+            time.sleep(self.movement_gap)
+
+
+    """# update point object to set new coords in a thread-safe manner
+    def updatePoint(self, nx, ny):
+        self.point.set(nx, ny)
+        self._car_rel_x, self._car_rel_y = self.point.get()"""
 
 
 if __name__ == "__main__":
