@@ -19,7 +19,7 @@ class UserVision:
             cv2.imwrite("frame_vlc.jpg", img)
 
 
-# Launch the web server in seperate thread.
+# Launch the web server in separate thread.
 appThread = Thread(target=App.app.run, args = [])
 appThread.start()
 
