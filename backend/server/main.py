@@ -2,6 +2,7 @@ import backend.server.app as App
 from pyparrot.DroneVisionGUI import DroneVisionGUI
 from threading import Thread
 import platform
+import cv2
 
 drone = App.drone
 
