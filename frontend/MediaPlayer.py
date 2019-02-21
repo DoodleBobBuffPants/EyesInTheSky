@@ -3,7 +3,6 @@ import cv2 as cv
 from threading import Thread
 import frontend.Lock as Lock
 import frontend.FrameGetter as fg
-import frontend.FrameSaver as fs
 from frontend import Queue
 
 class MediaPlayer:

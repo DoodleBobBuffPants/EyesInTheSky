@@ -99,17 +99,13 @@ def video():
         streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
         streamProc.daemon = True
         streamProc.start()
-        
-        cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
-        cfProc.daemon = True
-        cfProc.start()
 
     else:
         print("Video already running")
 
-        cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
-        cfProc.daemon = True
-        cfProc.start()
+    cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
+    cfProc.daemon = True
+    cfProc.start()
     return jsonify({})
 
 

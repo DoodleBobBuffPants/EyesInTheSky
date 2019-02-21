@@ -4,7 +4,6 @@
 
 import matlab.engine
 import cv2 as cv
-import backend.movement
 import os
 
 def call_car_filter(bebop, lock):
