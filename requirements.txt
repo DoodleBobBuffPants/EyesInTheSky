@@ -7,3 +7,5 @@ opencv-python==4.0.0.21
 pyparrot==1.5.10
 untangle==1.1.1
 zeroconf==0.21.3
+PyQt5==5.12
+PyQt5-sip==4.19.14
