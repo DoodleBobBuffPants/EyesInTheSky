@@ -5,6 +5,7 @@ import frontend.Lock as Lock
 import frontend.FrameGetter as fg
 import frontend.FrameSaver as fs
 from frontend import Queue
+import backend.CallCarFilter as cf
 
 class MediaPlayer:
 
@@ -25,6 +26,7 @@ class MediaPlayer:
         fgProc = Thread(target=fg.frameGetter, args=[queue, vc])
         fgProc.daemon = True
         fgProc.start()
+        
         # loop through each frame, making hand over for analysis easier
         while True:
             # read frame
