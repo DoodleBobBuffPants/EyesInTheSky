@@ -12,7 +12,7 @@ from frontend import Lock
 def call_car_filter(bebop, lock):
     # start the engine and cd to the matlab code
     eng = matlab.engine.start_matlab()
-    eng.cd("./backend/")
+    eng.cd("./backend/Matlab")
 
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab
@@ -50,7 +50,7 @@ def call_car_filter(bebop, lock):
     while True:
         cv.imwrite("backend/frame_for_filter.jpg", frame)
         # run the car filter with current frame
-        a = eng.run(cf, "backend/frame_for_filter.jpg")
+        a = eng.run(cf, "../frame_for_filter.jpg")
         print("Centroids: ", a)
 
         if len(a) > 0:
