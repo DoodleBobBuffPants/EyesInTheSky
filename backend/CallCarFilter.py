@@ -4,8 +4,7 @@
 import matlab.engine
 import cv2 as cv
 import os
-
-from frontend import Lock
+# for testing/calling independently
 
 
 def call_car_filter(bebop, lock):
@@ -64,5 +63,10 @@ def call_car_filter(bebop, lock):
 
 # to test directly calling this file
 if __name__ == '__main__':
+
+    import sys
+    from frontend import Lock   
+    
     lock = Lock.Lock()
     call_car_filter(1, lock)
+
