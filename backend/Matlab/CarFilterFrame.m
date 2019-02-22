@@ -24,16 +24,16 @@ classdef CarFilterFrame < handle
 	end
 
 	methods
-		function CF = CarFilterFrame()
+		function CF = CarFilterFrame();
 		    CF.obj = setupSysObjs(); %objects for IO, object detection
 
 		    CF.filterParams = getDefaultParams(); %params for Kalman Filter
 		    CF.carTrack = createFirstTrack(CF.filterParams); %Setup initial car location
 
-		    CF.framenumber=0
+		    CF.framenumber=0;
 		end
 
-		function pixelCoords = run(CF, frame)
+		function pixelCoords = run(CF, frame);
 			% MAIN PROGRAM	    
 		    % TODO: convert to a single run through on a frame by passing it as an argument
 
@@ -41,8 +41,8 @@ classdef CarFilterFrame < handle
 	        % CF.frame = readFrame(CF);
 	        CF.frame = imread(frame);
 	        [CF.centroids, CF.bboxes, CF.mask] = detectObjects(CF, CF.frame);
-	       	CF.framenumber = CF.framenumber +1
-	       	disp([CF.framenumber])
+	       	CF.framenumber = CF.framenumber + 1;
+	       	% disp([CF.framenumber])
 
 	        predictTracks(CF);
 	        [assignments, unassignedDetections, costs] = detectionToTrackAssignment(CF, CF.centroids);

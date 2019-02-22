@@ -1,7 +1,6 @@
 # call CarFilterFrame.m using one frame at a time
-# TODO: update paths to be run from EITS
-# TODO: start from app? 
 
+# TODO: stop the matlab code printing?
 import matlab.engine
 import cv2 as cv
 import os
@@ -15,7 +14,7 @@ def call_car_filter(bebop, lock):
     eng.cd("./backend/Matlab")
 
     # get handle to matlab object CarFilter
-    cf = eng.CarFilterFrame() # number of args returned from matlab
+    cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
 
     def coords_from_centroid(centroids):
         # calculate values to send to movement from the centroids values
@@ -51,7 +50,6 @@ def call_car_filter(bebop, lock):
         cv.imwrite("backend/frame_for_filter.jpg", frame)
         # run the car filter with current frame
         a = eng.run(cf, "../frame_for_filter.jpg")
-        print("Centroids: ", a)
 
         if len(a) > 0:
             x, y = coords_from_centroid(a[0])
