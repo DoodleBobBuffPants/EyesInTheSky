@@ -3,8 +3,6 @@
 % TODO: issue with bounding box size compared to the original
 % TODO: return centroid location
 
-
-
 classdef CarFilterFrame < handle
 	properties (SetAccess = public)
 		%flags for if we are still reliably tracking the car
@@ -45,7 +43,6 @@ classdef CarFilterFrame < handle
 	        [CF.centroids, CF.bboxes, CF.mask] = detectObjects(CF, CF.frame);
 	       	CF.framenumber = CF.framenumber +1
 	       	disp([CF.framenumber])
-            disp()
 
 	        predictTracks(CF);
 	        [assignments, unassignedDetections, costs] = detectionToTrackAssignment(CF, CF.centroids);
