@@ -10,8 +10,9 @@ from frontend import Lock
 
 
 def call_car_filter(bebop, lock):
-    # start the engine
+    # start the engine and cd to the matlab code
     eng = matlab.engine.start_matlab()
+    eng.cd("./backend/")
 
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab
