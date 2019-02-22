@@ -1,6 +1,8 @@
 # call CarFilterFrame.m using one frame at a time
 
 # TODO: test from app again
+# TODO: read from frame_vlc
+# TODO: start matlab engine earlier
 import matlab.engine
 import cv2 as cv
 import os
@@ -13,16 +15,20 @@ def call_car_filter(bebop, lock, source='drone'):
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
 
+    frame = None
     # load frame from source (either video or drone)
+    
     frame, vc = load_frame(bebop, lock, source)
+      
     height, width = frame.shape[:2] 
 
-    # TODO: avoid copying a file so much and/or locking
+    # TODO: avoid copying a file so much and/or locking?
     # TODO: end at some point
     # TODO: neater end for end of a video file
     while True:
         # write the frame for the filter to read from
         cv.imwrite("backend/frame_for_filter.jpg", frame)
+        print("updated picture")
         # run the car filter with current frame
         a = eng.run(cf, "../frame_for_filter.jpg")
 
@@ -31,16 +37,23 @@ def call_car_filter(bebop, lock, source='drone'):
             x, y = coords_from_centroid(a[0], width, height)
             # bebop.update_coords(x, y)
             print(x, y)
-
+        print("loading next frame")
         frame, vc = load_frame(bebop, lock, source, vc)
+        print("got next frame")
 
 
 def load_frame(bebop, lock, source, vc=None):
     # load a frame from either the drone or an mp4
     if source == 'drone':
+        print("taking lock")
         lock.take_lock()
-        frame = cv.imread("frame.jpg")
-        lock.release_lock
+        print("got lock")
+        frame = None
+        while frame is None:
+            frame = cv.imread("frame.jpg")
+        print("releasing lock")
+        lock.release_lock()
+        print("returning")
         return frame, vc
     elif source == 'mp4':
         if vc is None: # set up video capture 
