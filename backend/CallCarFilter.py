@@ -10,7 +10,6 @@ def call_car_filter(bebop, lock, source='drone'):
     # start the engine and cd to the matlab code
     eng = matlab.engine.start_matlab()
     eng.cd("./backend/Matlab")
-
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
 
@@ -33,6 +32,7 @@ def call_car_filter(bebop, lock, source='drone'):
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
+            print(x, y)
             bebop.update_coords(x, y)
         frame, vc = load_frame(bebop, lock, source, vc)
 

@@ -11,7 +11,7 @@ drone = App.drone
 class UserVision:
     def __init__(self, vision):
         self.vision = vision
-        self.lock = Lock.Lock()
+        self.lock = App.mp.getLock()
 
     def save_pictures(self, args):
         img = self.vision.get_latest_valid_picture()

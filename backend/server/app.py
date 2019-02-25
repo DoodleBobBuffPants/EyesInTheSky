@@ -101,6 +101,7 @@ def video():
         streamProc.start()
 
     else:
+        # Video will have been launched from main.py - no need to relaunch.
         print("Video already running")
 
     cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
