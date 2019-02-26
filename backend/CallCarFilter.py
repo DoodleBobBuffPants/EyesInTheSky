@@ -5,6 +5,7 @@
 # TODO: is it better to read the frame directly in matlab? (locking issues probably)
 
 # TODO: test with drone feed
+# TODO: testing w/ mp4 update coords
 
 # TODO: start matlab engine earlier
 import matlab.engine
@@ -12,9 +13,18 @@ import cv2 as cv
 import os
 
 def call_car_filter(bebop, lock, source='drone'):
-    # start the engine and cd to the matlab code
-    print("Starting matlab...")
-    eng = matlab.engine.start_matlab()
+
+    engines = matlab.engine.find_matlab()
+
+    if len(engines) > 0:
+        print("Connecting to matlab engine...")
+        eng = matlab.engine.connect_matlab()
+    else:
+        # start the engine and cd to the matlab code
+        print("Starting matlab...")
+        eng = matlab.engine.start_matlab()
+   
+    # cd to the matlab code in engine 
     eng.cd("./backend/Matlab")
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
@@ -39,8 +49,8 @@ def call_car_filter(bebop, lock, source='drone'):
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
-            # print(x, y)
-            bebop.update_coords(x, y)
+            print(x, y)
+            # bebop.update_coords(x, y)
         frame, vc = load_frame(bebop, lock, source, vc)
 
 

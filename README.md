@@ -8,6 +8,10 @@ Requirements:
 - filelock (for more reliable, non naive locking)
 - MATLAB
 
+MATLAB Requirements:
+- Deep Learning Toolbox
+- Computer Vision Toolkit
+
 Required environment variable:
 	OPENCV_FFMPEG_CAPTURE_OPTIONS = protocol_whitelist;file,rtp,udp
 
