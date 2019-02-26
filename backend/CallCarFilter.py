@@ -32,7 +32,6 @@ def call_car_filter(bebop, lock, source='drone'):
 
     frame = None
     # load frame from source (either video or drone)
-    
     frame, vc = load_frame(bebop, lock, source)
       
     height, width = frame.shape[:2] 
@@ -49,8 +48,10 @@ def call_car_filter(bebop, lock, source='drone'):
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
-            # print(x, y)
-            bebop.update_coords(x, y)
+            if(source == "drone"):
+                bebop.update_coords(x, y)
+            else: 
+                print(x, y)
         frame, vc = load_frame(bebop, lock, source, vc)
 
 
