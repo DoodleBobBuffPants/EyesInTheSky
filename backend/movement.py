@@ -43,7 +43,7 @@ class FollowingDrone(Bebop):
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 1
+    scale_factor = 0.5
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
@@ -79,7 +79,7 @@ class FollowingDrone(Bebop):
     def yaw(self, x):
         self._yaw = int(self.clamp(x, -100, 100))
 
-    def __init__(self, max_tilt: int = 5, max_height: int = 1, max_rotation_speed: int = 300, num_retries: int = 10):
+    def __init__(self, max_tilt: int = 5, max_height: int = 2, max_rotation_speed: int = 300, num_retries: int = 10):
         """
         :param max_tilt: maximum tilt angle, related to max speed
         :param max_height: height in metres
@@ -99,6 +99,7 @@ class FollowingDrone(Bebop):
             self.set_max_tilt(max_tilt)  # proxy for max speed
             self.set_max_altitude(max_height)  # in metres
             self.set_max_tilt_rotation_speed(max_rotation_speed)  # degrees/s
+            self.pan_tilt_camera(-90, 0) # Point the camera down
 
         # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
@@ -106,6 +107,7 @@ class FollowingDrone(Bebop):
         # TODO: combine connected and connection.is_connected, redundant
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
+            self.fly_direct(0,0,0,100,0.3)
         else:
             raise DroneNotConnectedException("Drone not connected yet")
 
@@ -114,10 +116,11 @@ class FollowingDrone(Bebop):
     # Alternatively can retrieve most up to date version of coordinates from the image recognition file.
     def update_coords(self, new_x, new_y):
         if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
-            self.car_unknown = True
+            #self.car_unknown = True
             self.car_rel_x = 0
             self.car_rel_y = 0
             return
+        self.car_unknown = False
         self.car_rel_x = new_x
         self.car_rel_y = new_y
 
@@ -147,11 +150,13 @@ class FollowingDrone(Bebop):
         # Alternative functions available:
         #   y = 100 * sin(pi/2 * x)
 
-        speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
-        if coord < 0:
+        #speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
+        speed = 100 * math.sin((math.pi / 2) * coord)
+        return speed
+        """if coord < 0:
             return speed * -1
         else:
-            return speed
+            return speed"""
 
     def sleep(self, time_length):
         self.smart_sleep(time_length)
