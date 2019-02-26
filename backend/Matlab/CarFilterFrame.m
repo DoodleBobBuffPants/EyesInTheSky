@@ -63,14 +63,16 @@ classdef CarFilterFrame < handle
                     CF.isLost = true;
                 end
             else
-                % detected something
-                
-                % Update track if was detected in previous and current frame
-                detectionIdx = assignments(1, 2);       % find car's detection
-                centroid = CF.centroids(detectionIdx, :);  % find assoc. center
-                bbox = CF.bboxes(detectionIdx, :);         % find assoc. bbox
                 
                 if CF.isDetected % Able to assume it is the car
+
+                    % detected something
+                
+                    % Update track if was detected in previous and current frame
+                    detectionIdx = assignments(1, 2);       % find car's detection
+                    centroid = CF.centroids(detectionIdx, :);  % find assoc. center
+                    bbox = CF.bboxes(detectionIdx, :);         % find assoc. bbox
+
                     % Limit growth of bbox
                     growthRate = 1.1;
                     maxWidth = growthRate * CF.carTrack.bbox(3);
