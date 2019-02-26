@@ -49,8 +49,8 @@ def call_car_filter(bebop, lock, source='drone'):
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
-            print(x, y)
-            # bebop.update_coords(x, y)
+            # print(x, y)
+            bebop.update_coords(x, y)
         frame, vc = load_frame(bebop, lock, source, vc)
 
 
