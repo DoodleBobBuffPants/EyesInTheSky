@@ -23,6 +23,9 @@ classdef CarFilterFrame < handle
 
     methods 
         function CF = CarFilterFrame();
+            % suppress warnings from loading carNet
+            warning('off', 'MATLAB:datastoreio:imagedatastore:unableToReadFile')
+
             CF.obj = setupSysObjs(); % objects for IO, object detection
             carNet = load("carNet.mat"); % load network
             CF.net = carNet.netTransfer;
@@ -31,6 +34,9 @@ classdef CarFilterFrame < handle
             CF.carTrack = createFirstTrack(CF.filterParams); %Setup initial car location
 
             CF.framenumber=0;
+
+            % turn warning back on
+            warning('on', 'MATLAB:datastoreio:imagedatastore:unableToReadFile')
         end
 
         function pixelCoords = run(CF, frame);

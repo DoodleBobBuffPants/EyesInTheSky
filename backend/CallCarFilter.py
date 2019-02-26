@@ -1,10 +1,7 @@
 # call CarFilterFrame.m using one frame at a time
 
-# TODO: issue with carNet trying to load a file from wrong path (is it an issue?)
+# TOOD: stop video feed
 
-# TODO: is it better to read the frame directly in matlab? (locking issues probably)
-
-# TODO: test with drone feed
 # TODO: testing w/ mp4 update coords
 
 # TODO: start matlab engine earlier
@@ -28,7 +25,7 @@ def call_car_filter(bebop, lock, source='drone'):
     eng.cd("./backend/Matlab")
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
-    print("Matlab engine ready")
+    print("Matlab engine ready.")
 
     frame = None
     # load frame from source (either video or drone)
