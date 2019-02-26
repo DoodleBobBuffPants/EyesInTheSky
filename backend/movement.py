@@ -43,7 +43,7 @@ class FollowingDrone(Bebop):
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 1
+    scale_factor = 0.2
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
@@ -148,11 +148,13 @@ class FollowingDrone(Bebop):
         # Alternative functions available:
         #   y = 100 * sin(pi/2 * x)
 
-        speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
-        if coord < 0:
+        #speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
+        speed = 100 * math.sin((math.pi / 2) * coord)
+        return speed
+        """if coord < 0:
             return speed * -1
         else:
-            return speed
+            return speed"""
 
     def sleep(self, time_length):
         self.smart_sleep(time_length)
