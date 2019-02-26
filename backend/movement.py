@@ -99,6 +99,7 @@ class FollowingDrone(Bebop):
             self.set_max_tilt(max_tilt)  # proxy for max speed
             self.set_max_altitude(max_height)  # in metres
             self.set_max_tilt_rotation_speed(max_rotation_speed)  # degrees/s
+            self.pan_tilt_camera(-90, 0) # Point the camera down
 
         # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
