@@ -1,6 +1,11 @@
 # call CarFilterFrame.m using one frame at a time
 
-# TODO: test from app again
+# TODO: issue with carNet trying to load a file from wrong path (is it an issue?)
+
+# TODO: is it better to read the frame directly in matlab? (locking issues probably)
+
+# TODO: test with drone feed
+
 # TODO: start matlab engine earlier
 import matlab.engine
 import cv2 as cv
@@ -8,10 +13,12 @@ import os
 
 def call_car_filter(bebop, lock, source='drone'):
     # start the engine and cd to the matlab code
+    print("Starting matlab...")
     eng = matlab.engine.start_matlab()
     eng.cd("./backend/Matlab")
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
+    print("Matlab engine ready")
 
     frame = None
     # load frame from source (either video or drone)
@@ -32,7 +39,7 @@ def call_car_filter(bebop, lock, source='drone'):
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
-            print(x, y)
+            # print(x, y)
             bebop.update_coords(x, y)
         frame, vc = load_frame(bebop, lock, source, vc)
 
@@ -48,7 +55,7 @@ def load_frame(bebop, lock, source, vc=None):
         return frame, vc
     elif source == 'mp4':
         if vc is None: # set up video capture 
-            vc = cv.VideoCapture('backend/TrainingData/data3.mp4')
+            vc = cv.VideoCapture('backend/TrainingData/droneData2.mp4')
         ret, frame = vc.read()
         return frame, vc
     else:
