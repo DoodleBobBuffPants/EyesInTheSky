@@ -2,10 +2,18 @@
 
 # TODO: test from app again
 # TODO: start matlab engine earlier
+from threading import Thread
+
 import matlab.engine
 import cv2 as cv
 import os
+
+from PIL import Image
+
 from backend import FindRed
+from frontend import Queue
+import frontend.FrameGetter as fg
+
 
 def call_car_filter(bebop, lock, source='drone'):
     # start the engine and cd to the matlab code
@@ -16,9 +24,18 @@ def call_car_filter(bebop, lock, source='drone'):
 
     frame = None
     # load frame from source (either video or drone)
-    
-    frame, vc = load_frame(bebop, lock, source)
-      
+
+    queue = Queue.Queue()
+    # new thread to get frames concurrently
+    bebop.start_video_stream()
+    vc = cv.VideoCapture("frontend/bebop.sdp")
+    fgProc = Thread(target=fg.frameGetter, args=[queue, vc])
+    fgProc.daemon = True
+    fgProc.start()
+
+    #frame, vc = load_frame(bebop, lock, source)
+    frame = queue.get()
+
     height, width = frame.shape[:2] 
 
     # TODO: avoid copying a file so much and/or locking?
@@ -26,20 +43,26 @@ def call_car_filter(bebop, lock, source='drone'):
     # TODO: neater end for end of a video file
     while True:
         # write the frame for the filter to read from
-        cv.imwrite("backend/frame_for_filter.jpg", frame)
+        # cv.imwrite("backend/frame_for_filter.jpg", frame)
         # run the car filter with current frame
         #a = eng.run(cf, "../frame_for_filter.jpg")
-        a = FindRed.find_red( "backend/frame_for_filter.jpg")
+        a = FindRed.find_red(frame)
+        #print(a)
 
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a, width, height)
             print(x, y)
             bebop.update_coords(x, y)
-        frame, vc = load_frame(bebop, lock, source, vc)
+        #frame, vc = load_frame(bebop, lock, source, vc)
+        print(frame)
+        im = Image.fromarray(frame.astype('uint8'))
+        im.show()
+        frame = queue.get()
 
 
 def load_frame(bebop, lock, source, vc=None):
+
     # load a frame from either the drone or an mp4
     if source == 'drone':
         lock.take_lock()

@@ -25,10 +25,9 @@ class UserVision:
 appThread = Thread(target=App.app.run, args = [])
 appThread.start()
 
-if platform.system() != "Windows":
+"""if platform.system() != "Windows":
     bebopVision = DroneVisionGUI(drone, is_bebop=True, user_code_to_run=None, user_args=(drone,))
     userVision = UserVision(bebopVision)
     bebopVision.set_user_callback_function(userVision.save_pictures, user_callback_args=None)
     bebopVision.open_video()
-
-
+"""
