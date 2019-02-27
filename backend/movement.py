@@ -13,11 +13,27 @@ class DroneNotConnectedException(DroneException):
 
 
 class FollowingDrone(Bebop):
+
+    # Use this value to adjust drones movement - not sure whether strictly required yet
+    # Max tilt angles also used for this
+    scale_factor = 0.1
+
+    # Time in seconds between instructions being sent to the drone. An arbitrary choice
+    # TODO - this should probably be the same rate that new car coordinates are received
+    movement_gap: float = 0.1
+
+    # Estimated time that the video feed is delayed by
+    video_delay = 1
+
+
     # Position of the car in relation to the drone.
     # Each value in range -1 to 1
     # User properties here to avoid setting to values outside [-1,1]
     _car_rel_y: float = 0
     _car_rel_x: float = 0
+
+    prev_car_rel_x: float = 0
+    prev_car_rel_y: float = 0
 
     finding_car : bool = False
 
@@ -40,14 +56,6 @@ class FollowingDrone(Bebop):
     # Safety flags
     car_unknown: bool = False  # car out of frame
     stop_following: bool = False  # emergency stop
-
-    # Use this value to adjust drones movement - not sure whether strictly required yet
-    # Max tilt angles also used for this
-    scale_factor = 0.1
-
-    # Time in seconds between instructions being sent to the drone. An arbitrary choice
-    # TODO - this should probably be the same rate that new car coordinates are received
-    movement_gap: float = 0.01
 
     # Current values of angles, from -100 to 100 (essentially a % of the set max value)
     # Use properties to ensure ints in range [-100,100]
@@ -107,7 +115,7 @@ class FollowingDrone(Bebop):
         # TODO: combine connected and connection.is_connected, redundant
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
-            self.fly_direct(0,0,0,100,0.3)
+            self.fly_direct(0,0,0,100,0.15)
         else:
             raise DroneNotConnectedException("Drone not connected yet")
 
@@ -221,9 +229,18 @@ class FollowingDrone(Bebop):
             # Travel in right direction, and turn to face car at the same time
             # Spin quickly so that drone flies forwards as much as possible
 
-            print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
-            self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
-            self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
+            #print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
+            #self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
+            #self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
+            predicted_x = self.car_rel_x + ((self.car_rel_x - self.prev_car_rel_x) * (self.video_delay /self.movement_gap))
+            predicted_y = self.car_rel_y + ((self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
+
+            self.roll = self.calculate_speed(predicted_x) * self.scale_factor
+            self.pitch = self.calculate_speed(predicted_y) * self.scale_factor
+
+            self.prev_car_rel_x = self.car_rel_x
+            self.prev_car_rel_y = self.car_rel_y
+
 
             # Divide by pi to get value in range -1 -to 1
             # TODO - make sure this gets tested... May need quicker rotation than this

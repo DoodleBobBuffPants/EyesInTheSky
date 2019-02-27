@@ -4,8 +4,8 @@ import numpy
 # Take an image and locate the area with the highest density of red pixels in
 
 # A pixel is accepted as red if its r > red, and g, b, < green, blue
-ACCEPTED_COLOUR = {"red":   200,
-                   "green": 100,
+ACCEPTED_COLOUR = {"red":   100,
+                   "green": 200,
                    "blue":  100}
 # The target only returns as found if one of the grid values is higher than this.
 # Prevents a location being returned if object not in image
@@ -15,8 +15,8 @@ grid = []
 width, height = None, None
 
 def accept_colour(pixel):
-    if (pixel[0] > ACCEPTED_COLOUR["red"] and pixel[1] < ACCEPTED_COLOUR["green"] & pixel[2] and ACCEPTED_COLOUR["blue"])\
-            or (pixel[0] - pixel[1] > 70 and pixel[0] - pixel[2] > 70):
+    if (pixel[0] < ACCEPTED_COLOUR["red"] and pixel[1] > ACCEPTED_COLOUR["green"] and pixel[2] < ACCEPTED_COLOUR["blue"])\
+            or (pixel[1] - pixel[0] > 70 and pixel[1] - pixel[2] > 70):
         return True
     return False
 

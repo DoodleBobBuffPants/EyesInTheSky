@@ -9,11 +9,30 @@ import cv2 as cv
 import os
 
 from PIL import Image
+from pyparrot.DroneVisionGUI import DroneVisionGUI
 
 from backend import FindRed
 from frontend import Queue
 import frontend.FrameGetter as fg
 
+
+class UserVision:
+    def __init__(self, vision):
+        self.vision = vision
+        #self.lock = App.mp.getLock()
+
+    def save_pictures(self, args):
+        img = self.vision.get_latest_valid_picture()
+
+        if (img is not None):
+            self.lock.take_lock()
+            #cv2.imwrite("frame.jpg", img)
+            self.lock.release_lock()
+
+    # Returns a numpy array with the latest image
+    def get_latest_image(self):
+        img = self.vision.get_latest_valid_picture()
+        return img
 
 def call_car_filter(bebop, lock, source='drone'):
     # start the engine and cd to the matlab code
@@ -25,16 +44,21 @@ def call_car_filter(bebop, lock, source='drone'):
     frame = None
     # load frame from source (either video or drone)
 
-    queue = Queue.Queue()
+    """queue = Queue.Queue()
     # new thread to get frames concurrently
     bebop.start_video_stream()
     vc = cv.VideoCapture("frontend/bebop.sdp")
     fgProc = Thread(target=fg.frameGetter, args=[queue, vc])
     fgProc.daemon = True
-    fgProc.start()
+    fgProc.start()"""
+
+    bebopVision = DroneVisionGUI(bebop, is_bebop=True, user_code_to_run=None, user_args=(bebop,))
+    userVision = UserVision(bebopVision)
+    bebopVision.set_user_callback_function(userVision.save_pictures, user_callback_args=None)
+    bebopVision.open_video()
 
     #frame, vc = load_frame(bebop, lock, source)
-    frame = queue.get()
+    frame = bebopVision.get_latest_valid_picture()
 
     height, width = frame.shape[:2] 
 
