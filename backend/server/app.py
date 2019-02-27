@@ -1,6 +1,7 @@
 # import from parent directory
 import sys
 import time
+import numpy as np
 
 sys.path.append('../..')
 
@@ -88,27 +89,10 @@ def follow():
     # follow_thread2.start()
     return jsonify({})
 
-
 @app.route('/video_start', methods=['POST'])
 def video():
-    print(platform.system())
-    # if platform.system() == "Windows":
-    #     drone.set_video_resolutions("rec1080_stream480")
-    #     drone.set_video_framerate("24_FPS")
-    #
-    #     # start video stream as separate process as it is blocking
-    #     vidPath = "frontend/bebop.sdp"
-    #     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
-    #     streamProc.daemon = True
-    #     streamProc.start()
-    if False:
-        pass
-
-    else:
-        # Video will have been launched from main.py - no need to relaunch.
-        print("Video already running")
-
-    cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
+    frame2 = np.array([])
+    cfProc = Thread(target=cf.call_car_filter, args=[drone, frame2])
     cfProc.daemon = True
     cfProc.start()
     return jsonify({})
@@ -145,7 +129,6 @@ def video_feed():
     # uv = UserVision(bv)
     # bv.set_user_callback_function(uv.save_pictures, user_callback_args=None)
     # bv.open_video()
-
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 

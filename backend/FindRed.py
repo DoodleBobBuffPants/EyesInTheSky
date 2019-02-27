@@ -50,6 +50,16 @@ def max_value():
     return best_coords
 
 
+def convert_coords_to_rel(real_coords):
+    real_x, real_y = real_coords
+    half_height = height / 2.0
+    half_width = width / 2.0
+
+    x = (real_x - half_width) / half_width
+    y = (half_height - real_y) / half_height
+    return x, y
+
+
 def find_red(image):
     global grid, width, height
     img = Image.fromarray(image.astype('uint8'))
@@ -73,17 +83,16 @@ def find_red(image):
             #print(r, c, pixel)
             accept_pixel = accept_colour(pixel)
             if accept_pixel:
-                #print(r, c)
+                print(r, c)
                 increase_grid(r, c)
 
-    return max_value()
-
-
-
+    highest_grid_position = max_value()
+    rel_coords = convert_coords_to_rel(highest_grid_position)
+    return rel_coords
 
 if __name__ == "__main__":
 
-    image2 = Image.open("IMG_0398.jpg")
+    image2 = Image.open("IMG_0404.jpg")
     #image2.show()
     np_image = numpy.array(image2.getdata()).reshape(image2.size[1], image2.size[0], 3)
 
@@ -91,5 +100,3 @@ if __name__ == "__main__":
     x, y = find_red(np_image)
     w, h = width / 2, height / 2
     print("X and Y: ", x, y)
-    print(w, h)
-    print((x - w)/w, (h - y)/h)
