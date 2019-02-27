@@ -1,22 +1,15 @@
-# import from parent directory
-import sys
-import time
+from backend.Camera import DroneCamera
+from backend.FindRed import find_red
 
-sys.path.append('../..')
+from threading import Thread
+from flask import Flask, render_template, request, jsonify, Response
+from backend import movement, FindRed
+from frontend import MediaPlayer
 
-# set environment variable
+import cv2
 import os
 
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
-
-from threading import Thread
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort, Response
-from backend import movement
-from frontend import MediaPlayer
-import platform
-import backend.CallCarFilter as cf
-
-import cv2
 
 app = Flask(__name__)
 
@@ -32,6 +25,7 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 
 # Create a single drone object on server
 drone = movement.FollowingDrone(num_retries=10)
+c = DroneCamera(drone)
 
 
 @app.route('/')
@@ -83,51 +77,18 @@ def follow():
     follow_thread = Thread(target=drone.follow_car, args=[])
     follow_thread.daemon = True
     follow_thread.start()
-    # follow_thread2 = Thread(target=drone.slowdown, args=[0.1, 2])
-    # follow_thread2.daemon = True
-    # follow_thread2.start()
+
     return jsonify({})
 
 
-@app.route('/video_start', methods=['POST'])
-def video():
-    print(platform.system())
-    # if platform.system() == "Windows":
-    #     drone.set_video_resolutions("rec1080_stream480")
-    #     drone.set_video_framerate("24_FPS")
-    #
-    #     # start video stream as separate process as it is blocking
-    #     vidPath = "frontend/bebop.sdp"
-    #     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
-    #     streamProc.daemon = True
-    #     streamProc.start()
-    if False:
-        pass
-
-    else:
-        # Video will have been launched from main.py - no need to relaunch.
-        print("Video already running")
-
-    cfProc = Thread(target=cf.call_car_filter, args=[drone, getFrameLock()])
-    cfProc.daemon = True
-    cfProc.start()
-    return jsonify({})
+def get_coords(frame):
+    x, y = find_red(frame)
+    return x, y
 
 
-def gen():
-    drone.set_video_resolutions("rec1080_stream480")
-    drone.set_video_framerate("24_FPS")
-    drone.set_video_stream_mode('low_latency')
-    drone.start_video_stream()
-    # start video stream as separate process as it is blocking
-    vidPath = "frontend/bebop.sdp"
-
-    vc = cv2.VideoCapture(vidPath)
-
+def gen(cam: DroneCamera):
     while True:
-        success = False
-        while not success:
-            success, frame = vc.read()
+        frame = cam.get_frame()
         if frame is not None:
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
@@ -141,13 +102,18 @@ def vid():
 
 @app.route('/video_feed')
 def video_feed():
-    # bv = DroneVision(drone, is_bebop=True)
-    # uv = UserVision(bv)
-    # bv.set_user_callback_function(uv.save_pictures, user_callback_args=None)
-    # bv.open_video()
-
-    return Response(gen(),
+    return Response(gen(c),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/video_feed1')
+def video_feed1():
+    return Response(gen(c), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/battery', methods=['POST'])
+def battery():
+    return jsonify({"battery": "100"})
 
 
 @app.route('/stop_follow', methods=['POST'])

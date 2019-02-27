@@ -49,6 +49,10 @@
                     </button>
                 </div>
             </div>
+            <div id="battery">
+                Battery: <p id="level"></p>
+            </div>
+            <div><button id="check_battery" onclick="check_battery()">Check Battery</button></div>
         </div>
     </div>
     <div class="row mt-2">
@@ -81,65 +85,26 @@
 
     <div class="row mt-2">
         <div class="col">
-            <button id="video" class="btn btn-success btn-block" onclick="video_start()">VIDEO</button>
+            <button id="video-clear" class="btn btn-primary btn-block" onclick="video_start()">VIDEO</button>
         </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="video-clear" class="btn btn-primary btn-block" onclick="video_clear()">VIDEO CLEAR</button>
+        </div>
+    </div>
+
+
+
+
+    <div id="video_feed_block">
+
     </div>
 
 </div>
 
-<script type="text/javascript">
-
-
-    function post(url, body = {}) {
-        console.log("");
-        console.log("POST to ", url, " with ", body);
-        fetch(url, {
-            method: 'POST', body: JSON.stringify(body), headers: {'Content-Type': 'application/json'},
-        })
-            .then(res => {
-                console.log(res.status);
-                res.json().then(data => console.log(data))
-            })
-            .catch(err => console.log(err))
-    }
-
-    function abort() {
-        post('/abort')
-    }
-
-    function follow() {
-        post('/follow')
-    }
-
-    function stop_follow() {
-        post('/stop_follow')
-    }
-
-    function video_start() {
-        post('/video_start')
-    }
-
-    function connect() {
-        post('/connect')
-    }
-
-    function disconnect() {
-        post('/disconnect')
-    }
-
-    function takeoff() {
-        post('/takeoff')
-    }
-
-    function change() {
-        post("/change_rel_coords", {
-            'new_x': document.getElementById('new_x').value,
-            'new_y': document.getElementById('new_y').value
-        })
-    }
-
-
-</script>
+<script type="text/javascript" src="{{  url_for('static', filename='main.js') }}"></script>
 
 </body>
 </html>
