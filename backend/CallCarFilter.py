@@ -37,9 +37,6 @@ def call_car_filter(bebop, lock, source='drone'):
 
     height, width = frame.shape[:2]
 
-    # TODO: avoid copying a file so much and/or locking?
-    # TODO: end at some point
-    # TODO: neater end for end of a video file
     while True:
         # write the frame for the filter to read from
         # cv.imwrite("backend/frame_for_filter.jpg", frame)
