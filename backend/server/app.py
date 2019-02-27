@@ -1,22 +1,24 @@
 # import from parent directory
 import sys
+import time
+
 sys.path.append('../..')
 
 # set environment variable
 import os
+
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
 
 from threading import Thread
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort, Response
 from backend import movement
 from frontend import MediaPlayer
 import platform
 import backend.CallCarFilter as cf
 
+import cv2
+
 app = Flask(__name__)
-
-
-
 
 # media player object for new thread
 mp = MediaPlayer.MediaPlayer()
@@ -28,7 +30,7 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 # This also connects to the drone as soon as the server starts
 # TODO: might be better to have a separate connect button on interface ???
 
-  # Create a single drone object on server
+# Create a single drone object on server
 drone = movement.FollowingDrone(num_retries=10)
 
 
@@ -90,15 +92,17 @@ def follow():
 @app.route('/video_start', methods=['POST'])
 def video():
     print(platform.system())
-    if platform.system() == "Windows":
-        drone.set_video_resolutions("rec1080_stream480")
-        drone.set_video_framerate("24_FPS")
-
-        # start video stream as separate process as it is blocking
-        vidPath = "frontend/bebop.sdp"
-        streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
-        streamProc.daemon = True
-        streamProc.start()
+    # if platform.system() == "Windows":
+    #     drone.set_video_resolutions("rec1080_stream480")
+    #     drone.set_video_framerate("24_FPS")
+    #
+    #     # start video stream as separate process as it is blocking
+    #     vidPath = "frontend/bebop.sdp"
+    #     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
+    #     streamProc.daemon = True
+    #     streamProc.start()
+    if False:
+        pass
 
     else:
         # Video will have been launched from main.py - no need to relaunch.
@@ -108,6 +112,42 @@ def video():
     cfProc.daemon = True
     cfProc.start()
     return jsonify({})
+
+
+def gen():
+    drone.set_video_resolutions("rec1080_stream480")
+    drone.set_video_framerate("24_FPS")
+    drone.set_video_stream_mode('low_latency')
+    drone.start_video_stream()
+    # start video stream as separate process as it is blocking
+    vidPath = "frontend/bebop.sdp"
+
+    vc = cv2.VideoCapture(vidPath)
+
+    while True:
+        success = False
+        while not success:
+            success, frame = vc.read()
+        if frame is not None:
+            ret, jpgframe = cv2.imencode('.jpg', frame)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
+
+
+@app.route('/video_experiment')
+def vid():
+    return render_template('vid.html')
+
+
+@app.route('/video_feed')
+def video_feed():
+    # bv = DroneVision(drone, is_bebop=True)
+    # uv = UserVision(bv)
+    # bv.set_user_callback_function(uv.save_pictures, user_callback_args=None)
+    # bv.open_video()
+
+    return Response(gen(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/stop_follow', methods=['POST'])
@@ -127,9 +167,11 @@ def errors(err: Exception):
                        status_code=500)
     return response, 500
 
+
 # can get a reference to the frame.jpg lock
 def getFrameLock():
     return mp.getLock()
+
 
 if __name__ == "__main__":
     app.run()
