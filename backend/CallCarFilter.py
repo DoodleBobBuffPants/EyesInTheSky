@@ -10,7 +10,7 @@ import os
 
 from PIL import Image
 
-from backend import FindRed
+from backend import FindCar
 from frontend import Queue
 import frontend.FrameGetter as fg
 
@@ -38,7 +38,7 @@ def call_car_filter(bebop, lock, source='drone'):
     height, width = frame.shape[:2]
 
     while True:
-        a = FindRed.find_red(frame)
+        a = FindCar.find_red(frame)
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a, width, height)

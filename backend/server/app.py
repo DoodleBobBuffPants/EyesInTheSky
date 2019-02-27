@@ -1,9 +1,9 @@
 from backend.Camera import DroneCamera
-from backend.FindRed import CarFinder
+from backend.FindCar import CarFinder
 
 from threading import Thread
 from flask import Flask, render_template, request, jsonify, Response
-from backend import movement, FindRed
+from backend import movement, FindCar
 from frontend import MediaPlayer
 
 import cv2
