@@ -86,10 +86,30 @@ def get_coords(frame):
     return x, y
 
 
+global running_updater
+running_updater = False
+
+
+def find_and_update(frame):
+    global running_updater
+    x, y = find_red(frame)
+    drone.update_coords(x, y)
+    running_updater = False
+    return
+
+
 def gen(cam: DroneCamera):
+    global running_updater
     while True:
         frame = cam.get_frame()
         if frame is not None:
+            if not running_updater:
+                running_updater = True
+                frame_copy = frame.copy()
+                newThread = Thread(target=find_and_update, args=(frame_copy,))
+
+                newThread.setDaemon(True)
+                newThread.start()
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
@@ -113,7 +133,8 @@ def video_feed1():
 
 @app.route('/battery', methods=['POST'])
 def battery():
-    return jsonify({"battery": "100"})
+    battery_level = drone.battery
+    return jsonify({"battery": battery_level})
 
 
 @app.route('/stop_follow', methods=['POST'])

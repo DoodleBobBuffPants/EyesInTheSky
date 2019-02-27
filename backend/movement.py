@@ -16,7 +16,7 @@ class FollowingDrone(Bebop):
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 0.1
+    scale_factor = 0.3
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
@@ -36,6 +36,8 @@ class FollowingDrone(Bebop):
     prev_car_rel_y: float = 0
 
     finding_car : bool = False
+
+    battery = 100
 
     @property
     def car_rel_x(self):
@@ -115,14 +117,24 @@ class FollowingDrone(Bebop):
         # TODO: combine connected and connection.is_connected, redundant
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
-            self.fly_direct(0,0,0,100,0.15)
+            started_updating_coords = False
+            self.fly_direct(0,0,0,100,0.25)
         else:
             raise DroneNotConnectedException("Drone not connected yet")
+
+    started_updating_coords = False
 
     # One option for updating the coordinates of the car's relative position.
     # Can be called by the image recognition area.
     # Alternatively can retrieve most up to date version of coordinates from the image recognition file.
     def update_coords(self, new_x, new_y):
+        if self.started_updating_coords:
+            new_modulus = math.sqrt(new_x**2 + new_y**2)
+            current_modulus = math.sqrt(self.car_rel_x**2 + self.car_rel_y**2)
+            difference = new_modulus - current_modulus
+            if difference > 0.4:
+                return
+
         if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
             #self.car_unknown = True
             self.car_rel_x = 0
@@ -131,6 +143,11 @@ class FollowingDrone(Bebop):
         self.car_unknown = False
         self.car_rel_x = new_x
         self.car_rel_y = new_y
+        #self.set_user_sensor_callback(self.update_battery)
+
+    def update_battery(self, sensor_dictionary):
+        print("Sensors: ", sensor_dictionary)
+
 
     # For emergency manual override
     def immediate_land(self):
@@ -159,6 +176,9 @@ class FollowingDrone(Bebop):
         #   y = 100 * sin(pi/2 * x)
 
         #speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
+        if abs(coord) < 0.15:
+            print("AUFIAUSHDUKANDGYFSJKADVAWKDGVAISCHGDV ASIGASDUGASVDAS")
+            return 0
         speed = 100 * math.sin((math.pi / 2) * coord)
         return speed
         """if coord < 0:
@@ -177,11 +197,13 @@ class FollowingDrone(Bebop):
         if not self.drone_connection.is_connected:
             raise DroneNotConnectedException("Disconnected while moving")
         # TODO - Wait until has been at 0 for a few time periods?
-        if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
+        """if self.roll == 0 and self.pitch == 0 and self.yaw == 0:
             self.flat_trim(0)
         else:
             self.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=int(vertical_movement),
-                            duration=self.movement_gap)
+                            duration=self.movement_gap)"""
+        self.fly_direct(self.roll, self.pitch, self.yaw, vertical_movement=int(vertical_movement),
+                        duration=self.movement_gap)
 
     def hover(self):
         self.pitch = 0
@@ -232,8 +254,11 @@ class FollowingDrone(Bebop):
             #print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
             #self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             #self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
-            predicted_x = self.car_rel_x + ((self.car_rel_x - self.prev_car_rel_x) * (self.video_delay /self.movement_gap))
+            predicted_x = self.car_rel_x + ((self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap))
             predicted_y = self.car_rel_y + ((self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
+            print("Current relative:", self.car_rel_x, self.car_rel_y)
+            print("Old relative:    ", self.prev_car_rel_x, self.prev_car_rel_y)
+            print("Predicted:", predicted_x, predicted_y)
 
             self.roll = self.calculate_speed(predicted_x) * self.scale_factor
             self.pitch = self.calculate_speed(predicted_y) * self.scale_factor
@@ -241,12 +266,13 @@ class FollowingDrone(Bebop):
             self.prev_car_rel_x = self.car_rel_x
             self.prev_car_rel_y = self.car_rel_y
 
+            self.started_updating_coords = True
 
             # Divide by pi to get value in range -1 -to 1
             # TODO - make sure this gets tested... May need quicker rotation than this
             #self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
-            print(self.car_rel_x, self.car_rel_y)
-            print(self.pitch, self.roll, self.yaw)
+            #print(self.car_rel_x, self.car_rel_y)
+            #print(self.pitch, self.roll, self.yaw)
             # TODO - move vertical movement to a global variable??
             self.move(0)
 

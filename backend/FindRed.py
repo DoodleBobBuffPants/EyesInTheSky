@@ -15,8 +15,10 @@ grid = []
 width, height = None, None
 
 def accept_colour(pixel):
-    if (pixel[0] < ACCEPTED_COLOUR["red"] and pixel[1] > ACCEPTED_COLOUR["green"] and pixel[2] < ACCEPTED_COLOUR["blue"])\
+    """if (pixel[0] < ACCEPTED_COLOUR["red"] and pixel[1] > ACCEPTED_COLOUR["green"] and pixel[2] < ACCEPTED_COLOUR["blue"])\
             or (pixel[1] - pixel[0] > 70 and pixel[1] - pixel[2] > 70):
+        return True"""
+    if (pixel[1] > 180):
         return True
     return False
 
@@ -76,18 +78,19 @@ def find_red(image):
         grid.append(new_row)
 
     #img.show()
-    for r in range(height):
-        for c in range(width):
+    for r in range(0, height):
+        for c in range(0, width):
             pixel = pixels[r * width + c]
             pixel = (pixel[2], pixel[1], pixel[0])
             #print(r, c, pixel)
             accept_pixel = accept_colour(pixel)
             if accept_pixel:
-                print(r, c)
+                #print(r, c)
                 increase_grid(r, c)
 
     highest_grid_position = max_value()
     rel_coords = convert_coords_to_rel(highest_grid_position)
+    print(rel_coords)
     return rel_coords
 
 if __name__ == "__main__":
