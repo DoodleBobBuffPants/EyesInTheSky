@@ -18,7 +18,6 @@ class CarFinder:
     grid = []
     width, height = None, None
 
-
     @staticmethod
     def accept_colour(pixel):
         """if (pixel[0] < ACCEPTED_COLOUR["red"] and pixel[1] > ACCEPTED_COLOUR["green"] and pixel[2] < ACCEPTED_COLOUR["blue"])\
@@ -66,12 +65,10 @@ class CarFinder:
         y = (half_height - real_y) / half_height
         return x, y
 
-
     def get_shrunken_pixels(self, im):
 
         pixels = list(im.getdata())
         new_pixels = []
-
 
         initial_width, initial_height = im.size
         new_width, new_height = initial_width // self.SCALE_RATIO, initial_height // self.SCALE_RATIO
@@ -109,14 +106,11 @@ class CarFinder:
             for c in range(self.width):
                 pixel = pixels[r * self.width + c]
                 pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB
-                # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position1 = self.max_value()
-        print(highest_grid_position1)
 
         # Run across the image in the opposite direction and average the two highest values.
         self.reset_grid()
@@ -124,21 +118,18 @@ class CarFinder:
             for c in range(self.width - 1, -1, -1):
                 pixel = pixels[r * self.width + c]
                 pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB
-                # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    # print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position2 = self.max_value()
-        print(highest_grid_position2)
 
-        rel_coords = self.convert_coords_to_rel(self.average_coordinates([highest_grid_position1, highest_grid_position2]))
-        print(rel_coords)
+        rel_coords = self.convert_coords_to_rel(
+            self.average_coordinates([highest_grid_position1, highest_grid_position2]))
         return rel_coords
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     test_image = Image.open("IMG_0404.jpg")
     # image2.show()
     np_image = numpy.array(test_image.getdata()).reshape(test_image.size[1], test_image.size[0], 3)

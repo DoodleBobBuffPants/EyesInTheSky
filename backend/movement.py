@@ -13,7 +13,6 @@ class DroneNotConnectedException(DroneException):
 
 
 class FollowingDrone(Bebop):
-
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
     scale_factor = 0.3
@@ -25,7 +24,6 @@ class FollowingDrone(Bebop):
     # Estimated time that the video feed is delayed by
     video_delay = 1
 
-
     # Position of the car in relation to the drone.
     # Each value in range -1 to 1
     # User properties here to avoid setting to values outside [-1,1]
@@ -35,7 +33,7 @@ class FollowingDrone(Bebop):
     prev_car_rel_x: float = 0
     prev_car_rel_y: float = 0
 
-    finding_car : bool = False
+    finding_car: bool = False
 
     battery = 100
 
@@ -109,7 +107,7 @@ class FollowingDrone(Bebop):
             self.set_max_tilt(max_tilt)  # proxy for max speed
             self.set_max_altitude(max_height)  # in metres
             self.set_max_tilt_rotation_speed(max_rotation_speed)  # degrees/s
-            self.pan_tilt_camera(-90, 0) # Point the camera down
+            self.pan_tilt_camera(-90, 0)  # Point the camera down
 
         # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
 
@@ -118,7 +116,7 @@ class FollowingDrone(Bebop):
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
             started_updating_coords = False
-            self.fly_direct(0,0,0,100,0.25)
+            self.fly_direct(0, 0, 0, 100, 0.25)
         else:
             raise DroneNotConnectedException("Drone not connected yet")
 
@@ -129,32 +127,35 @@ class FollowingDrone(Bebop):
     # Alternatively can retrieve most up to date version of coordinates from the image recognition file.
     def update_coords(self, new_x, new_y):
         if self.started_updating_coords:
-            new_modulus = math.sqrt(new_x**2 + new_y**2)
-            current_modulus = math.sqrt(self.car_rel_x**2 + self.car_rel_y**2)
+            new_modulus = math.sqrt(new_x ** 2 + new_y ** 2)
+            current_modulus = math.sqrt(self.car_rel_x ** 2 + self.car_rel_y ** 2)
             difference = new_modulus - current_modulus
             if difference > 0.4:
                 return
 
         if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
-            #self.car_unknown = True
+            # self.car_unknown = True
             self.car_rel_x = 0
             self.car_rel_y = 0
             return
         self.car_unknown = False
         self.car_rel_x = new_x
         self.car_rel_y = new_y
-        #self.set_user_sensor_callback(self.update_battery)
+        # self.set_user_sensor_callback(self.update_battery)
 
     def update_battery(self, sensor_dictionary):
         print("Sensors: ", sensor_dictionary)
 
+    def battery_check(self):
+        self.ask_for_state_update()
+        return self.sensors.battery
 
     # For emergency manual override
     def immediate_land(self):
 
         self.stop_following = True
         time.sleep(self.movement_gap)
-        self.hover()    # Go to level flight
+        self.hover()  # Go to level flight
 
         self.safe_land(5)
 
@@ -175,7 +176,7 @@ class FollowingDrone(Bebop):
         # Alternative functions available:
         #   y = 100 * sin(pi/2 * x)
 
-        #speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
+        # speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
         if abs(coord) < 0.15:
             print("AUFIAUSHDUKANDGYFSJKADVAWKDGVAISCHGDV ASIGASDUGASVDAS")
             return 0
@@ -242,7 +243,6 @@ class FollowingDrone(Bebop):
             if not self.drone_connection.is_connected:
                 raise DroneNotConnectedException("Drone disconnected while following")
 
-
             # Check pyparrot documentation for this
 
             # v. naive
@@ -251,11 +251,13 @@ class FollowingDrone(Bebop):
             # Travel in right direction, and turn to face car at the same time
             # Spin quickly so that drone flies forwards as much as possible
 
-            #print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
-            #self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
-            #self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
-            predicted_x = self.car_rel_x + ((self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap))
-            predicted_y = self.car_rel_y + ((self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
+            # print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
+            # self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
+            # self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
+            predicted_x = self.car_rel_x + (
+                        (self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap))
+            predicted_y = self.car_rel_y + (
+                        (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
             print("Current relative:", self.car_rel_x, self.car_rel_y)
             print("Old relative:    ", self.prev_car_rel_x, self.prev_car_rel_y)
             print("Predicted:", predicted_x, predicted_y)
@@ -270,9 +272,9 @@ class FollowingDrone(Bebop):
 
             # Divide by pi to get value in range -1 -to 1
             # TODO - make sure this gets tested... May need quicker rotation than this
-            #self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
-            #print(self.car_rel_x, self.car_rel_y)
-            #print(self.pitch, self.roll, self.yaw)
+            # self.yaw = self.calculate_speed(math.atan2(self.car_rel_x, self.car_rel_y) / math.pi)
+            # print(self.car_rel_x, self.car_rel_y)
+            # print(self.pitch, self.roll, self.yaw)
             # TODO - move vertical movement to a global variable??
             self.move(0)
 
@@ -293,7 +295,7 @@ class FollowingDrone(Bebop):
         # Become stationary in non-vertical axes
         self.hover()
 
-        time.sleep(0.5) # Allow the drone to enter level flight
+        time.sleep(0.5)  # Allow the drone to enter level flight
 
         # ASSUME: car_unknown will be set to false once we are in range of the car, so this method wont be called
 
@@ -309,7 +311,6 @@ class FollowingDrone(Bebop):
                 break
             self.move(3)  # set vertical speed to 3% of max vertical speed
             time.sleep(self.movement_gap)
-
 
     """# update point object to set new coords in a thread-safe manner
     def updatePoint(self, nx, ny):
