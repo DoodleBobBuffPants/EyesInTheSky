@@ -81,6 +81,7 @@ def follow():
     return jsonify({})
 
 
+# TODO - Is this ever used
 def get_coords(frame):
     x, y = find_red(frame)
     return x, y
