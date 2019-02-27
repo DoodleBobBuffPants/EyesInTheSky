@@ -90,15 +90,17 @@ def follow():
 @app.route('/video_start', methods=['POST'])
 def video():
     print(platform.system())
-    if platform.system() == "Windows":
-        drone.set_video_resolutions("rec1080_stream480")
-        drone.set_video_framerate("24_FPS")
-
-        # start video stream as separate process as it is blocking
-        vidPath = "frontend/bebop.sdp"
-        streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
-        streamProc.daemon = True
-        streamProc.start()
+    # if platform.system() == "Windows":
+    #     drone.set_video_resolutions("rec1080_stream480")
+    #     drone.set_video_framerate("24_FPS")
+    #
+    #     # start video stream as separate process as it is blocking
+    #     vidPath = "frontend/bebop.sdp"
+    #     streamProc = Thread(target=mp.playVid, args=[vidPath, drone])
+    #     streamProc.daemon = True
+    #     streamProc.start()
+    if False:
+        pass
 
     else:
         # Video will have been launched from main.py - no need to relaunch.

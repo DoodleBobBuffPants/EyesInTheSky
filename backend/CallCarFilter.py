@@ -17,26 +17,25 @@ import frontend.FrameGetter as fg
 
 def call_car_filter(bebop, lock, source='drone'):
     # start the engine and cd to the matlab code
-    #eng = matlab.engine.start_matlab()
-    #eng.cd("./backend/Matlab")
+    # eng = matlab.engine.start_matlab()
+    # eng.cd("./backend/Matlab")
     # get handle to matlab object CarFilter
-    #cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
+    # cf = eng.CarFilterFrame() # number of args returned from matlab (default 1)
 
     frame = None
     # load frame from source (either video or drone)
 
-    queue = Queue.Queue()
     # new thread to get frames concurrently
     bebop.start_video_stream()
     vc = cv.VideoCapture("frontend/bebop.sdp")
-    fgProc = Thread(target=fg.frameGetter, args=[queue, vc])
-    fgProc.daemon = True
-    fgProc.start()
 
-    #frame, vc = load_frame(bebop, lock, source)
-    frame = queue.get()
+    # frame, vc = load_frame(bebop, lock, source)
 
-    height, width = frame.shape[:2] 
+    success = False
+    while not success:
+        success, frame = vc.read()
+
+    height, width = frame.shape[:2]
 
     # TODO: avoid copying a file so much and/or locking?
     # TODO: end at some point
@@ -45,24 +44,21 @@ def call_car_filter(bebop, lock, source='drone'):
         # write the frame for the filter to read from
         # cv.imwrite("backend/frame_for_filter.jpg", frame)
         # run the car filter with current frame
-        #a = eng.run(cf, "../frame_for_filter.jpg")
+        # a = eng.run(cf, "../frame_for_filter.jpg")
         a = FindRed.find_red(frame)
-        #print(a)
-
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a, width, height)
             print(x, y)
             bebop.update_coords(x, y)
-        #frame, vc = load_frame(bebop, lock, source, vc)
-        #print(frame)
-        im = Image.fromarray(frame.astype('uint8'))
-        #im.show()
-        frame = queue.get()
+        # frame, vc = load_frame(bebop, lock, source, vc)
+        success = False
+        while not success:
+            success, frame = vc.read()
+            cv.waitKey(1)
 
 
 def load_frame(bebop, lock, source, vc=None):
-
     # load a frame from either the drone or an mp4
     if source == 'drone':
         lock.take_lock()
@@ -72,32 +68,34 @@ def load_frame(bebop, lock, source, vc=None):
         lock.release_lock()
         return frame, vc
     elif source == 'mp4':
-        if vc is None: # set up video capture 
+        if vc is None:  # set up video capture
             vc = cv.VideoCapture('backend/TrainingData/data3.mp4')
         ret, frame = vc.read()
         return frame, vc
     else:
         raise ValueError("No valid frame source given: must be mp4 or drone.")
 
+
 def coords_from_centroid(centroids, width, height):
     # calculate values to send to movement from the centroids values
     # subtract by half of the image dimensions and then divide by half again before returning
     # gives them in range -1 and 1
-    h = height/2.0
-    w = width/2.0
+    h = height / 2.0
+    w = width / 2.0
 
     x = centroids[0]
     y = centroids[1]
 
-    x = (x - w)/w
-    y = (h - y)/h
+    x = (x - w) / w
+    y = (h - y) / h
     return x, y
+
 
 # to test directly calling this file
 # optional argument: '-mp4': uses training data 3
 if __name__ == '__main__':
     import sys
-    from frontend import Lock   
+    from frontend import Lock
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-mp4":
@@ -106,4 +104,3 @@ if __name__ == '__main__':
     else:
         lock = Lock.Lock()
         call_car_filter(1, lock)
-

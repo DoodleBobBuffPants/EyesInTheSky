@@ -43,7 +43,7 @@ class FollowingDrone(Bebop):
 
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 0.1
+    scale_factor = 0.25
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
