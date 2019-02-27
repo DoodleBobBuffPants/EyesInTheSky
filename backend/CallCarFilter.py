@@ -55,9 +55,9 @@ def call_car_filter(bebop, lock, source='drone'):
             print(x, y)
             bebop.update_coords(x, y)
         #frame, vc = load_frame(bebop, lock, source, vc)
-        print(frame)
+        #print(frame)
         im = Image.fromarray(frame.astype('uint8'))
-        im.show()
+        #im.show()
         frame = queue.get()
 
 

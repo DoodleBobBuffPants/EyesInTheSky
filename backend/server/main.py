@@ -21,6 +21,11 @@ class UserVision:
             cv2.imwrite("frame.jpg", img)
             self.lock.release_lock()
 
+    # Returns a numpy array with the latest image
+    def get_latest_image(self):
+        img = self.vision.get_latest_valid_picture()
+        return img
+
 # Launch the web server in separate thread.
 appThread = Thread(target=App.app.run, args = [])
 appThread.start()
