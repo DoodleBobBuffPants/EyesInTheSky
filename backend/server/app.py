@@ -1,5 +1,5 @@
 from backend.Camera import DroneCamera
-from backend.FindRed import find_red
+from backend.FindRed import CarFinder
 
 from threading import Thread
 from flask import Flask, render_template, request, jsonify, Response
@@ -92,7 +92,8 @@ running_updater = False
 
 def find_and_update(frame):
     global running_updater
-    x, y = find_red(frame)
+    car_finder = CarFinder()
+    x, y = car_finder.find_car(frame)
     drone.update_coords(x, y)
     running_updater = False
     return
