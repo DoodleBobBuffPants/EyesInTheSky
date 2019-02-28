@@ -7,20 +7,20 @@ import numpy
 class CarFinder:
     # This is the colour that the target is.
     # Options are red, green, blue, white
-    REQUIRED_COLOUR = "green"
+    REQUIRED_COLOUR = "red"
 
     # Determines what range of pixels will be accepted. e.g. REQUIRED_COLOUR = green => the pixel must have red and
     # blue values less than what is given below, but a higher green value. White required all the pixel's values
     # to be higher
-    ACCEPTED_COLOUR = {"red": 100,
-                       "green": 200,
+    ACCEPTED_COLOUR = {"red": 200,
+                       "green": 100,
                        "blue": 100}
     # Another method of testing for a correctly coloured pixel. Pixel will be accepted if the REQUIRED_COLOUR
     # component is RGB_DIFFERENCE greater than both the other pixel colour components
     RGB_DIFFERENCE = 50
     # The target only returns as found if one of the grid values is higher than this.
     # Prevents a location being returned if object not in image
-    MINIMUM_ACCEPTANCE_VALUE = 200  # TODO - Is this too big
+    MINIMUM_ACCEPTANCE_VALUE = 1000  # TODO - Is this too big
 
     SCALE_RATIO = 8
 
@@ -132,8 +132,8 @@ class CarFinder:
         initial_width, initial_height = im.size
         new_width, new_height = initial_width // self.SCALE_RATIO, initial_height // self.SCALE_RATIO
 
-        for r in range(0, initial_height, 8):
-            for c in range(0, initial_width, 8):
+        for r in range(0, initial_height, self.SCALE_RATIO):
+            for c in range(0, initial_width, self.SCALE_RATIO):
                 pixel = pixels[r * initial_width + c]
                 new_pixels.append(pixel)
 
@@ -176,11 +176,11 @@ class CarFinder:
         for r in range(self.height):
             for c in range(self.width):
                 pixel = pixels[r * self.width + c]
-                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB
-                # print(r, c, pixel)
+                #pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO - flip the pixel?
+                #print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    print(r, c)
+                    #print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position1 = self.max_value()
@@ -191,11 +191,11 @@ class CarFinder:
         for r in range(self.height - 1, -1, -1):
             for c in range(self.width - 1, -1, -1):
                 pixel = pixels[r * self.width + c]
-                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB
-                # print(r, c, pixel)
+                #pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO flip the pixel?
+                #print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    # print(r, c)
+                    #print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position2 = self.max_value()
@@ -208,7 +208,7 @@ class CarFinder:
 
 
 if __name__ == "__main__":
-    test_image = Image.open("IMG_0404.jpg")
+    test_image = Image.open("IMG_0408.jpg")
     # image2.show()
     np_image = numpy.array(test_image.getdata()).reshape(test_image.size[1], test_image.size[0], 3)
 
@@ -218,10 +218,10 @@ if __name__ == "__main__":
     print("X and Y: ", x, y)
 
     draw = ImageDraw.Draw(test_image)
-    original_x = int(x * w2 + w2) * 8
-    original_y = int(h2 - y * h2) * 8
+    original_x = int(x * w2 + w2) * car_finder.SCALE_RATIO
+    original_y = int(h2 - y * h2) * car_finder.SCALE_RATIO
     print(original_x, original_y)
     r = 10
 
-    draw.ellipse((original_x - r, original_y - r, original_x + r, original_y + r), fill=(255, 0, 0, 255))
+    draw.ellipse((original_x - r, original_y - r, original_x + r, original_y + r), fill=(0, 0, 0, 255))
     test_image.show()
