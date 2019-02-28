@@ -12,6 +12,7 @@ class DroneCamera(object):
         vidPath = "frontend/bebop.sdp"
 
         self.vc = cv2.VideoCapture(vidPath)
+        self.vc.set(cv2.CAP_PROP_FPS, 24)
 
     def get_frame(self):
         success = False

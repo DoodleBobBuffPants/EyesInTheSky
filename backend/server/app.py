@@ -1,13 +1,16 @@
-from backend.Camera import DroneCamera
-from backend.FindCar import CarFinder
-
+import os
+from multiprocessing import Queue
+from queue import Full
 from threading import Thread
-from flask import Flask, render_template, request, jsonify, Response
-from backend import movement, FindCar
-from frontend import MediaPlayer
 
 import cv2
-import os
+import numpy as np
+from flask import Flask, render_template, request, jsonify, Response
+
+from backend import movement
+from backend.Camera import DroneCamera
+from backend.FindCar import CarFinder
+from frontend import MediaPlayer
 
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
 
@@ -26,6 +29,7 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 # Create a single drone object on server
 drone = movement.FollowingDrone(num_retries=10)
 c = DroneCamera(drone)
+frame_copy = np.zeros((480, 856, 3))
 
 
 @app.route('/')
@@ -81,37 +85,41 @@ def follow():
     return jsonify({})
 
 
-# TODO - Is this ever used
-def get_coords(frame):
-    x, y = find_red(frame)
-    return x, y
-
-
-global running_updater
-running_updater = False
-
-
-def find_and_update(frame):
-    global running_updater
+def find_and_update(frameq):
     car_finder = CarFinder()
-    x, y = car_finder.find_car(frame)
-    drone.update_coords(x, y)
-    running_updater = False
-    return
 
-
-def gen(cam: DroneCamera):
-    global running_updater
     while True:
-        frame = cam.get_frame()
+        frame = frameq.get()
         if frame is not None:
-            if not running_updater:
-                running_updater = True
-                frame_copy = frame.copy()
-                newThread = Thread(target=find_and_update, args=(frame_copy,))
+            x, y = car_finder.find_car(frame)
+            print(x, y)
+            drone.update_coords(x, y)
 
-                newThread.setDaemon(True)
-                newThread.start()
+
+def get_always(q):
+    while True:
+        try:
+            q.put(c.get_frame(), block=False)
+        except Full:
+            continue
+
+
+def gen():
+    fq = Queue(maxsize=2)
+
+    # start updating coordinates and finding car in frame (forever)
+    new_thread = Thread(target=find_and_update, args=(fq,))
+    new_thread.setDaemon(True)
+    new_thread.start()
+
+    # start collecting frames into queue forever
+    new_thread = Thread(target=get_always, args=(fq,))
+    new_thread.setDaemon(True)
+    new_thread.start()
+
+    while True:
+        frame = fq.get()
+        if frame is not None:
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
@@ -124,18 +132,13 @@ def vid():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(c),
+    return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-@app.route('/video_feed1')
-def video_feed1():
-    return Response(gen(c), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/battery', methods=['POST'])
 def battery():
-    battery_level = drone.battery
+    battery_level = drone.battery_check()
     return jsonify({"battery": battery_level})
 
 
@@ -145,8 +148,6 @@ def follow_stop():
     drone.stop_following = True
     drone.hover()
 
-    # Find a way to kill the follow thread ??
-    # Or maybe setting flag is sufficient
     return jsonify({})
 
 
