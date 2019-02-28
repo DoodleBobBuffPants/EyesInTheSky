@@ -109,8 +109,6 @@ class FollowingDrone(Bebop):
             self.set_max_tilt_rotation_speed(max_rotation_speed)  # degrees/s
             self.pan_tilt_camera(-90, 0)  # Point the camera down
 
-        # TODO - Must make sure the camera is always pointing down - even when the drone is at an angle
-
     def atakeoff(self):
         # TODO: combine connected and connection.is_connected, redundant
         if self.connected or self.drone_connection.is_connected:
@@ -134,7 +132,7 @@ class FollowingDrone(Bebop):
             #   return
         """
         if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
-            # self.car_unknown = True
+            # TODO - self.car_unknown = True
             self.car_rel_x = 0
             self.car_rel_y = 0
             return
@@ -254,10 +252,26 @@ class FollowingDrone(Bebop):
             # print(self.calculate_speed(self.car_rel_x) * self.scale_factor)
             # self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             # self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
+
+            # When the drone quickly reaches the car, usually there is a large swing backwards
+            # reduce the scale of the prediction when the relative coordinates are low
+
+            # OPTION 1:
+            x_scale = 1 if abs(self.car_rel_x) < 0.2 else 0.4
+            y_scale = 1 if abs(self.car_rel_y) < 0.2 else 0.4
+
+            # OPTION 2:
+            #x_scale = 0.7 * abs(self.car_rel_x) + 0.3
+            #y_scale = 0.7 * abs(self.car_rel_y) + 0.3
+
             predicted_x = self.car_rel_x + (
-                        (self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap))
+                        (self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap) * x_scale)
             predicted_y = self.car_rel_y + (
-                        (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
+                        (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap) * y_scale)
+
+
+
+
             #print("Current relative:", self.car_rel_x, self.car_rel_y)
             #print("Old relative:    ", self.prev_car_rel_x, self.prev_car_rel_y)
             #print("Predicted:", predicted_x, predicted_y)
@@ -304,19 +318,16 @@ class FollowingDrone(Bebop):
         # TODO: add a check on altitude to make sure we dont go above it? - Does max altitude work
         # TODO: experiment with vertical speed and spinning (yaw) speed
         # TODO : experiment with raising the camera angle to see more area
-        self.yaw = 5
+        self.yaw = 20
+        self.pan_tilt_camera(-75, 0)
         while True:
             if not self.car_unknown:
                 self.finding_car = False
+                self.car_unknown = False
+                self.pan_tilt_camera_velocity(self, 0, -3, duration=5)
                 break
             self.move(3)  # set vertical speed to 3% of max vertical speed
             time.sleep(self.movement_gap)
-
-    """# update point object to set new coords in a thread-safe manner
-    def updatePoint(self, nx, ny):
-        self.point.set(nx, ny)
-        self._car_rel_x, self._car_rel_y = self.point.get()"""
-
 
 if __name__ == "__main__":
     d = FollowingDrone(num_retries=1)
