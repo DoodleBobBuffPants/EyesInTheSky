@@ -15,14 +15,14 @@ class DroneNotConnectedException(DroneException):
 class FollowingDrone(Bebop):
     # Use this value to adjust drones movement - not sure whether strictly required yet
     # Max tilt angles also used for this
-    scale_factor = 0.3
+    scale_factor = 0.1
 
     # Time in seconds between instructions being sent to the drone. An arbitrary choice
     # TODO - this should probably be the same rate that new car coordinates are received
     movement_gap: float = 0.1
 
     # Estimated time that the video feed is delayed by
-    video_delay = 1
+    video_delay = 0.5
 
     # Position of the car in relation to the drone.
     # Each value in range -1 to 1
@@ -116,7 +116,7 @@ class FollowingDrone(Bebop):
         if self.connected or self.drone_connection.is_connected:
             self.safe_takeoff(10)
             started_updating_coords = False
-            self.fly_direct(0, 0, 0, 100, 0.25)
+            self.fly_direct(0, 0, 0, 100, 0.15)
         else:
             raise DroneNotConnectedException("Drone not connected yet")
 
@@ -126,13 +126,13 @@ class FollowingDrone(Bebop):
     # Can be called by the image recognition area.
     # Alternatively can retrieve most up to date version of coordinates from the image recognition file.
     def update_coords(self, new_x, new_y):
-        if self.started_updating_coords:
-            new_modulus = math.sqrt(new_x ** 2 + new_y ** 2)
-            current_modulus = math.sqrt(self.car_rel_x ** 2 + self.car_rel_y ** 2)
+        """if self.started_updating_coords:
+            #new_modulus = math.sqrt(new_x ** 2 + new_y ** 2)
+            #current_modulus = math.sqrt(self.car_rel_x ** 2 + self.car_rel_y ** 2)
             difference = new_modulus - current_modulus
-            if difference > 0.4:
-                return
-
+            #if difference > 0.4:
+            #   return
+        """
         if new_x < -1 or new_x > 1 or new_y < -1 or new_y > 1:  # Invalid coordinates for the car - treat is as unknown location
             # self.car_unknown = True
             self.car_rel_x = 0
@@ -177,9 +177,9 @@ class FollowingDrone(Bebop):
         #   y = 100 * sin(pi/2 * x)
 
         # speed = 100 * math.sqrt(1 - (abs(coord) - 1) ** 2)
-        if abs(coord) < 0.15:
+        """if abs(coord) < 0.15:
             print("AUFIAUSHDUKANDGYFSJKADVAWKDGVAISCHGDV ASIGASDUGASVDAS")
-            return 0
+            return 0"""
         speed = 100 * math.sin((math.pi / 2) * coord)
         return speed
         """if coord < 0:
@@ -258,10 +258,10 @@ class FollowingDrone(Bebop):
                         (self.car_rel_x - self.prev_car_rel_x) * (self.video_delay / self.movement_gap))
             predicted_y = self.car_rel_y + (
                         (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap))
-            print("Current relative:", self.car_rel_x, self.car_rel_y)
-            print("Old relative:    ", self.prev_car_rel_x, self.prev_car_rel_y)
-            print("Predicted:", predicted_x, predicted_y)
-
+            #print("Current relative:", self.car_rel_x, self.car_rel_y)
+            #print("Old relative:    ", self.prev_car_rel_x, self.prev_car_rel_y)
+            #print("Predicted:", predicted_x, predicted_y)
+            print("Predicted: %.3f %.3f" % (predicted_x, predicted_y))
             self.roll = self.calculate_speed(predicted_x) * self.scale_factor
             self.pitch = self.calculate_speed(predicted_y) * self.scale_factor
 

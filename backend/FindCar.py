@@ -12,7 +12,7 @@ class CarFinder:
     # Determines what range of pixels will be accepted. e.g. REQUIRED_COLOUR = green => the pixel must have red and
     # blue values less than what is given below, but a higher green value. White required all the pixel's values
     # to be higher
-    ACCEPTED_COLOUR = {"red": 200,
+    ACCEPTED_COLOUR = {"red": 180,
                        "green": 100,
                        "blue": 100}
     # Another method of testing for a correctly coloured pixel. Pixel will be accepted if the REQUIRED_COLOUR
@@ -22,7 +22,7 @@ class CarFinder:
     # Prevents a location being returned if object not in image
     MINIMUM_ACCEPTANCE_VALUE = 1000  # TODO - Is this too big
 
-    SCALE_RATIO = 8
+    SCALE_RATIO = 2
 
     grid = []
     width, height = None, None
@@ -100,7 +100,7 @@ class CarFinder:
                 if grid_value > best_value:
                     best_value = grid_value
                     best_coords = (x, y)
-        print(best_value)
+        #best_value)
         return best_coords
 
     def convert_to_relative(self, real_coords: (int, int)) -> (float, float):
@@ -176,7 +176,7 @@ class CarFinder:
         for r in range(self.height):
             for c in range(self.width):
                 pixel = pixels[r * self.width + c]
-                #pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO - flip the pixel?
+                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO - flip the pixel?
                 #print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
@@ -184,14 +184,14 @@ class CarFinder:
                     self.increase_grid(r, c)
 
         highest_grid_position1 = self.max_value()
-        print(highest_grid_position1)
+        #print(highest_grid_position1)
 
         # Run across the image in the opposite direction and average the two highest values.
         self.reset_grid()
         for r in range(self.height - 1, -1, -1):
             for c in range(self.width - 1, -1, -1):
                 pixel = pixels[r * self.width + c]
-                #pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO flip the pixel?
+                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO flip the pixel?
                 #print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
@@ -199,11 +199,11 @@ class CarFinder:
                     self.increase_grid(r, c)
 
         highest_grid_position2 = self.max_value()
-        print(highest_grid_position2)
+        #print(highest_grid_position2)
 
         rel_coords = self.convert_to_relative(
             self.average_coordinates([highest_grid_position1, highest_grid_position2]))
-        print(rel_coords)
+
         return rel_coords
 
 
