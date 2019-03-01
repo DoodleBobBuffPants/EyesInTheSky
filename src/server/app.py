@@ -21,13 +21,10 @@ mp = MediaPlayer.MediaPlayer()
 
 app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17\xf3\xd1'
 
-# Global-ish drone variable, this will only work when the server runs on a single thread and there is one user
-# sending requests TODO: change this so it is better
-# This also connects to the drone as soon as the server starts
-# TODO: might be better to have a separate connect button on interface ???
-
 # Create a single drone object on server
 drone = Movement.FollowingDrone(num_retries=10)
+
+# Global camera object, initialised on server start
 c = DroneCamera(drone)
 frame_copy = np.zeros((480, 856, 3))
 
@@ -125,6 +122,7 @@ def gen():
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
+
 
 @app.route('/video_feed')
 def video_feed():
