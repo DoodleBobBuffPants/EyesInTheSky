@@ -223,7 +223,7 @@ class FollowingDrone(Bebop):
         time.sleep(0.5)  # Allow the drone to enter level flight
 
         # Spin the drone and raise the camera angle to get a bigger field of view
-        self.yaw = 20
+        self.yaw = 70
         self.pan_tilt_camera(-75, 0)
         while True:
             if not self.car_unknown:
