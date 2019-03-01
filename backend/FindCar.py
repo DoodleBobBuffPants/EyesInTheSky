@@ -20,7 +20,7 @@ class CarFinder:
     RGB_DIFFERENCE = 50
     # The target only returns as found if one of the grid values is higher than this.
     # Prevents a location being returned if object not in image
-    MINIMUM_ACCEPTANCE_VALUE = 1000  # TODO - Is this too big
+    MINIMUM_ACCEPTANCE_VALUE = 1000
 
     SCALE_RATIO = 2
 
@@ -92,7 +92,7 @@ class CarFinder:
         :rtype: (int, int)
         :return: location, (x,y), of the cell in grid with the highest value. (0, 0) top left
         """
-        best_coords = (-1.1, -1.1)  # Returns invalid coordinate if no best found # TODO - try this at -1 instead
+        best_coords = (-1.1, -1.1)  # Returns invalid coordinate if no best found
         best_value = self.MINIMUM_ACCEPTANCE_VALUE  # Grid value must beat this to be accepted
         for x in range(self.width):
             for y in range(self.height):
@@ -162,6 +162,13 @@ class CarFinder:
         avg_y = sum_y / len(coord_list)
         return avg_x, avg_y
 
+
+    @staticmethod
+    def flip_pixel(pixel):
+        """Takes a pixel in BGR form and converts to RGB"""
+        new_pixel = (pixel[2], pixel[1], pixel[0])
+        return new_pixel
+
     def find_car(self, numpy_image):
         """ Looks for the largest sized section of a particular colour
 
@@ -176,7 +183,7 @@ class CarFinder:
         for r in range(self.height):
             for c in range(self.width):
                 pixel = pixels[r * self.width + c]
-                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO - flip the pixel?
+                pixel = self.flip_pixel(pixel)
                 # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
@@ -191,7 +198,7 @@ class CarFinder:
         for r in range(self.height - 1, -1, -1):
             for c in range(self.width - 1, -1, -1):
                 pixel = pixels[r * self.width + c]
-                pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO flip the pixel?
+                pixel = self.flip_pixel(pixel)
                 # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
