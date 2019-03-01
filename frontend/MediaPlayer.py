@@ -1,24 +1,45 @@
-#read frames using opencv and display frames as a video
-import sys
-sys.path.append("..")
+# read frames using opencv and display frames as a video
 import cv2 as cv
-#from filelock import FileLock
-import backend.Lock as lock 		#custom naive lock
-def playVid(vidpath):
-	vc = cv.VideoCapture(vidpath)
-	#loop through each frame, making hand over for analysis easier
-	while True:
-		#successful read and frame
-		success, frame = vc.read()
-		if success:
-			#display frame sequence
-			cv.imshow('Video', frame)
-			lock.take_lock()
-			cv.imwrite("frame.jpg", frame)
-			lock.release_lock()
-			#close 'video' on key input 'q'
-			if (cv.waitKey(7) == ord('q')):
-				break
-	#release resources
-	vc.release()
-	cv.destroyAllWindows()
+from threading import Thread
+import frontend.Lock as Lock
+import frontend.FrameGetter as Fg
+from frontend import Queue
+
+
+class MediaPlayer:
+
+    # initialise state
+    def __init__(self):
+        self.lock = Lock.Lock()
+
+    # get lock reference
+    def get_lock(self):
+        return self.lock
+
+    # noinspection SpellCheckingInspection,SpellCheckingInspection
+    def play_vid(self, vidpath, bebop):
+        # queue of frames
+        queue = Queue.Queue()
+        # new thread to get frames concurrently
+        bebop.start_video_stream()
+        vc = cv.VideoCapture(vidpath)
+        fg_proc = Thread(target=Fg.frame_getter, args=[queue, vc])
+        fg_proc.daemon = True
+        fg_proc.start()
+
+        # loop through each frame, making hand over for analysis easier
+        while True:
+            # read frame
+            frame = queue.get()
+            # synchronised write out of frame for concurrency control during analysis
+            self.lock.take_lock()
+            cv.imwrite("frame.jpg", frame)
+            self.lock.release_lock()
+            cv.imshow('Video', frame)
+            if cv.waitKey(1) == ord('q'):
+                # exit
+                break
+        # release resources
+        cv.destroyAllWindows()
+        vc.release()
+        bebop.stop_video_stream()

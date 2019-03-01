@@ -1,0 +1,2 @@
+Test synchronized point object works correctly
+                Success

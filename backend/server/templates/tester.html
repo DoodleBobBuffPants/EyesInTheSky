@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Drone Controller</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"#}
+{#          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+
+    <style>
+        .mt-2 {
+            margin-top: 2px;
+            margin-bottom: 2px
+        }
+
+    </style>
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <h3>Errors:</h3>
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+{% block body %}{% endblock %}
+
+
+<div class="container">
+    <div class="row mt-2">
+
+        <div class="form-group">
+            <div class="form-row">
+                <div class="col">
+                    <input class="form-control" id="new_x" name="new_x" placeholder="relative x"/>
+                </div>
+                <div class="col">
+                    <input class="form-control" id="new_y" name="new_y" placeholder="relative y"/>
+                </div>
+                <div class="col">
+                    <button id="change" class="btn btn-primary btn-block" onclick="change()">change relative coords
+                    </button>
+                </div>
+            </div>
+            <div id="battery">
+                Battery: <p id="level"></p>
+            </div>
+            <div><button id="check_battery" onclick="check_battery()">Check Battery</button></div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <button id="abort" class="btn btn-danger btn-block" onclick="abort()">ABORT</button>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="start_follow" class="btn btn-primary btn-block" onclick="follow()">START FOLLOWING</button>
+        </div>
+        <div class="col">
+            <button id="stop_follow" class="btn btn-secondary btn-block" onclick="stop_follow()">STOP FOLLOWING</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="connect" class="btn btn-primary btn-block" onclick="connect()">CONNECT</button>
+        </div>
+        <div class="col">
+            <button id="disconnect" class="btn btn-secondary btn-block" onclick="disconnect()">DISCONNECT</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="take off" class="btn btn-success btn-block" onclick="takeoff()">TAKE OFF</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="video-clear" class="btn btn-primary btn-block" onclick="video_start()">VIDEO</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <button id="video-clear" class="btn btn-primary btn-block" onclick="video_clear()">VIDEO CLEAR</button>
+        </div>
+    </div>
+
+
+
+
+    <div id="video_feed_block">
+
+    </div>
+
+</div>
+
+<script type="text/javascript" src="{{  url_for('static', filename='main.js') }}"></script>
+
+</body>
+</html>
