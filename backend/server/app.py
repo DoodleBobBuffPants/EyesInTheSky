@@ -50,7 +50,7 @@ def change():
 def takeoff():
     if not (drone.connected or drone.drone_connection.is_connected):
         return jsonify(message="Drone not Connected"), 500
-    return jsonify(command_sent=drone.atakeoff())
+    return jsonify(command_sent=drone.drone_takeoff())
 
 
 @app.route('/abort', methods=['POST'])
@@ -92,7 +92,7 @@ def find_and_update(frameq):
         frame = frameq.get()
         if frame is not None:
             x, y = car_finder.find_car(frame)
-            #print(x, y)
+            print("Actual: %.3f %.3f" % (round(x, 3), round(y, 3)))
             drone.update_coords(x, y)
 
 
