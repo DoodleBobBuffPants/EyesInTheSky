@@ -4,13 +4,32 @@ augmenter = imageDataAugmenter('RandXReflection', true, 'RandYReflection', true,
     'RandRotation',[0 360], 'RandScale',[0.5 1.5],...
     'RandXTranslation', [-30 30], 'RandYTranslation', [-30 30]); % translation in pixels
 
-imds = imageDatastore('data', ...
+imds = imageDatastore('newData', ...
     'IncludeSubfolders',true, ...
     'LabelSource','foldernames');
 
-[imdsTrain,imdsValidation] = splitEachLabel(imds,0.8, 'randomized');
+[imdsTrain,imdsValidation] = splitEachLabel(imds,0.7, 'randomized');
 imageSize = [227 227 3]; % size required by alexnet
 auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',augmenter);
 augimdsValidation = augmentedImageDatastore(imageSize,imdsValidation);
 
 end
+
+%{
+imdsTest = imageDatastore('New folder', ...
+    'IncludeSubfolders',true, ...
+    'LabelSource','foldernames');
+
+imageSize = [227 227 3]; % size required by alexnet
+augimdsTest = augmentedImageDatastore(imageSize,imds);
+[YPred,scores] = classify(netTransfer,augimdsTest);
+
+figure
+for i = 1:16
+    subplot(4,4,i)
+    I = readimage(imdsTest,i);
+    imshow(I)
+    label = YPred(i);
+    title(scores(i));
+end
+%}
