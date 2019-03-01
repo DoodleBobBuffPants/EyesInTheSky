@@ -2,7 +2,7 @@
 import cv2 as cv
 
 
-def frameGetter(queue, vc):
+def frame_getter(queue, vc):
     # continuously add frames to the shared thread-safe queue
     while True:
         success, frame = vc.read()

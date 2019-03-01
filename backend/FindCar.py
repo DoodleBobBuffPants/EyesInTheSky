@@ -100,7 +100,7 @@ class CarFinder:
                 if grid_value > best_value:
                     best_value = grid_value
                     best_coords = (x, y)
-        #best_value)
+        # best_value)
         return best_coords
 
     def convert_to_relative(self, real_coords: (int, int)) -> (float, float):
@@ -177,14 +177,14 @@ class CarFinder:
             for c in range(self.width):
                 pixel = pixels[r * self.width + c]
                 pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO - flip the pixel?
-                #print(r, c, pixel)
+                # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    #print(r, c)
+                    # print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position1 = self.max_value()
-        #print(highest_grid_position1)
+        # print(highest_grid_position1)
 
         # Run across the image in the opposite direction and average the two highest values.
         self.reset_grid()
@@ -192,14 +192,14 @@ class CarFinder:
             for c in range(self.width - 1, -1, -1):
                 pixel = pixels[r * self.width + c]
                 pixel = (pixel[2], pixel[1], pixel[0])  # Correct the BGR to RGB # TODO flip the pixel?
-                #print(r, c, pixel)
+                # print(r, c, pixel)
                 accept_pixel = self.accept_colour(pixel)
                 if accept_pixel:
-                    #print(r, c)
+                    # print(r, c)
                     self.increase_grid(r, c)
 
         highest_grid_position2 = self.max_value()
-        #print(highest_grid_position2)
+        # print(highest_grid_position2)
 
         rel_coords = self.convert_to_relative(
             self.average_coordinates([highest_grid_position1, highest_grid_position2]))
@@ -213,15 +213,15 @@ if __name__ == "__main__":
     np_image = numpy.array(test_image.getdata()).reshape(test_image.size[1], test_image.size[0], 3)
 
     car_finder = CarFinder()
-    x, y = car_finder.find_car(np_image)
+    test_x, test_y = car_finder.find_car(np_image)
     w2, h2 = car_finder.width / 2, car_finder.height / 2
-    print("X and Y: ", x, y)
+    print("X and Y: ", test_x, test_y)
 
     draw = ImageDraw.Draw(test_image)
-    original_x = int(x * w2 + w2) * car_finder.SCALE_RATIO
-    original_y = int(h2 - y * h2) * car_finder.SCALE_RATIO
+    original_x = int(test_x * w2 + w2) * car_finder.SCALE_RATIO
+    original_y = int(h2 - test_y * h2) * car_finder.SCALE_RATIO
     print(original_x, original_y)
-    r = 10
+    radius = 10
 
-    draw.ellipse((original_x - r, original_y - r, original_x + r, original_y + r), fill=(0, 0, 0, 255))
+    draw.ellipse((original_x - radius, original_y - radius, original_x + radius, original_y + radius), fill=(0, 0, 0, 255))
     test_image.show()

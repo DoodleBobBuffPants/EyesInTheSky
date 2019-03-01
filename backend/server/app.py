@@ -85,6 +85,7 @@ def follow():
     return jsonify({})
 
 
+# noinspection SpellCheckingInspection
 def find_and_update(frameq):
     car_finder = CarFinder()
 
@@ -120,6 +121,7 @@ def gen():
     while True:
         frame = fq.get()
         if frame is not None:
+            # noinspection SpellCheckingInspection
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
@@ -159,8 +161,8 @@ def errors(err: Exception):
 
 
 # can get a reference to the frame.jpg lock
-def getFrameLock():
-    return mp.getLock()
+def get_frame_lock():
+    return mp.get_lock()
 
 
 if __name__ == "__main__":

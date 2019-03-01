@@ -16,7 +16,7 @@ class Queue:
         while len(self.buf) == 0:
             pass
         self.lock.take_lock()
-        if self.first == False:
+        if not self.first:
             ret = self.buf[0]
             self.buf = self.buf[1:]
         else:

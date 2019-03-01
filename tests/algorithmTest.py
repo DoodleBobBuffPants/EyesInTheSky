@@ -42,7 +42,7 @@ class TestFollowingDrone(FollowingDrone):
     test_scale_factor = 1
 
     # Drone can see objects within a box.
-    # Sqaure box, with side length given here - drone at the centre
+    # Square box, with side length given here - drone at the centre
     field_of_view = 25
 
     def __init__(self, x, y):
@@ -57,7 +57,7 @@ class TestFollowingDrone(FollowingDrone):
         time.sleep(time_length)
 
     # Override the movement function so that movements are made within virtual world
-    def move(self, vertical_movement):
+    def move(self, vertical_movement=0):
         self.world_x += self.roll * self.movement_gap * self.test_scale_factor
         self.world_y += self.pitch * self.movement_gap * self.test_scale_factor
 

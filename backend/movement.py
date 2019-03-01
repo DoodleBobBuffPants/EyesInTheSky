@@ -132,8 +132,8 @@ class FollowingDrone(Bebop):
         self.safe_land(5)
 
     @staticmethod
-    def clamp(n, minn, maxn):
-        return max(min(maxn, n), minn)
+    def clamp(n, min_n, max_n):
+        return max(min(max_n, n), min_n)
 
     # Given one of the coordinates, return the speed required to move in that direction.
     # Returned value is percentage of maximum tilt angle (-100 to 100). May be scaled elsewhere
@@ -189,7 +189,6 @@ class FollowingDrone(Bebop):
             # self.roll = self.calculate_speed(self.car_rel_x) * self.scale_factor
             # self.pitch = self.calculate_speed(self.car_rel_y) * self.scale_factor
 
-
             # Often have big swing backwards once drone reaches car
             # reduce the scale of the prediction when the relative coordinates are low
             # OPTION 1:
@@ -217,12 +216,8 @@ class FollowingDrone(Bebop):
 
             self.sleep(self.movement_gap)
 
-
-    def find_car(self, timeout: int = 5):
-        """ Called when car cannot be found in the image - attempts to locate car
-
-        :param timeout: time in seconds before which we
-        """
+    def find_car(self):
+        """ Called when car cannot be found in the image - attempts to locate car"""
 
         self.hover()
         time.sleep(0.5)  # Allow the drone to enter level flight
@@ -234,10 +229,11 @@ class FollowingDrone(Bebop):
             if not self.car_unknown:
                 self.finding_car = False
                 self.car_unknown = False
-                self.pan_tilt_camera_velocity(self, 0, -3, duration=5) # SLowly move the camera back to vertical
+                self.pan_tilt_camera_velocity(self, 0, -3, duration=5)  # Slowly move the camera back to vertical
                 break
             self.move(vertical_movement=3)  # set vertical speed to 3% of max vertical speed
             time.sleep(self.movement_gap)
+
 
 if __name__ == "__main__":
     d = FollowingDrone(num_retries=1)

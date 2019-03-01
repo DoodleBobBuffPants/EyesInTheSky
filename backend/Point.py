@@ -2,6 +2,7 @@
 # lock for synchronized use
 import frontend.Lock as Lock
 
+
 class Point:
     # set up
     def __init__(self):

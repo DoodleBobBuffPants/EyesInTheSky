@@ -7,12 +7,13 @@ from pyparrot.Bebop import Bebop
 
 
 # function to uncover payload
-def stripPacket(m):
+def strip_packet(m):
     ba = bitstring.BitArray(bytes=m)  # encode string and turn to bit array
     pt = ba[9:16]  # type of packet contents
-    cc = ba[4:8]  # number of extra header fields
+    # cc = ba[4:8]  # number of extra header fields
     print(pt.uint)  # for testing purposes
     # return ba[(12 + cc) * 8:]  # bit contents
+
 
 # create drone and start video
 drone = Bebop()
@@ -28,7 +29,7 @@ sock.bind(('192.168.42.63', 55004))  # binds machine to port
 # receive packet and get payload
 for _ in range(10):
     msg = sock.recv(4096)
-    stripPacket(msg)
+    strip_packet(msg)
     # payload = stripPacket(msg)
 
 '''

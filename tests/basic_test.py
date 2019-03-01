@@ -13,6 +13,6 @@ thread.start()
 time.sleep(3)
 
 drone.car_rel_y = 0
-drone.drone.safe_land(3)
-drone.drone.emergency_land()
-drone.drone.disconnect()
+drone.safe_land(3)
+drone.emergency_land()
+drone.disconnect()

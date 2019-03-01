@@ -1,5 +1,9 @@
 # get function to test
-import frontend.MediaPlayer as mp
+from frontend.MediaPlayer import MediaPlayer as Mp
+from backend.movement import FollowingDrone
 
+# noinspection SpellCheckingInspection
 testvid = "testvideo.mp4"  # test video - should use rtp://localhost:55004
-mp.playVid(testvid)
+mp = Mp()
+drone = FollowingDrone()
+mp.play_vid(testvid, drone)

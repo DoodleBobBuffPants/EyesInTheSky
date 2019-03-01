@@ -2,8 +2,9 @@
 import cv2 as cv
 from threading import Thread
 import frontend.Lock as Lock
-import frontend.FrameGetter as fg
+import frontend.FrameGetter as Fg
 from frontend import Queue
+
 
 class MediaPlayer:
 
@@ -12,19 +13,20 @@ class MediaPlayer:
         self.lock = Lock.Lock()
 
     # get lock reference
-    def getLock(self):
+    def get_lock(self):
         return self.lock
 
-    def playVid(self, vidpath, bebop):
+    # noinspection SpellCheckingInspection,SpellCheckingInspection
+    def play_vid(self, vidpath, bebop):
         # queue of frames
         queue = Queue.Queue()
         # new thread to get frames concurrently
         bebop.start_video_stream()
         vc = cv.VideoCapture(vidpath)
-        fgProc = Thread(target=fg.frameGetter, args=[queue, vc])
-        fgProc.daemon = True
-        fgProc.start()
-        
+        fg_proc = Thread(target=Fg.frame_getter, args=[queue, vc])
+        fg_proc.daemon = True
+        fg_proc.start()
+
         # loop through each frame, making hand over for analysis easier
         while True:
             # read frame
@@ -35,9 +37,9 @@ class MediaPlayer:
             self.lock.release_lock()
             cv.imshow('Video', frame)
             if cv.waitKey(1) == ord('q'):
-            	# exit
+                # exit
                 break
-        # relese resources
+        # release resources
         cv.destroyAllWindows()
         vc.release()
         bebop.stop_video_stream()
