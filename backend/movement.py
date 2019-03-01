@@ -81,7 +81,7 @@ class FollowingDrone(Bebop):
     def yaw(self, x):
         self._yaw = int(self.clamp(x, -100, 100))
 
-    def __init__(self, max_tilt: int = 5, max_height: int = 2, max_rotation_speed: int = 300, num_retries: int = 3):
+    def __init__(self, max_tilt: int = 5, max_height: int = 2, max_rotation_speed: int = 100, num_retries: int = 3):
         """
 
         :param max_rotation_speed: Degrees per second that the drone can rotate at
@@ -205,7 +205,7 @@ class FollowingDrone(Bebop):
             predicted_y = self.car_rel_y + (
                     (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap) * y_scale)
 
-            print("Predicted:                %.3f %.3f" % (round(predicted_x, 3), round(predicted_y, 3)))
+            print("Predicted:                %s%.3f %s%.3f" % ("" if predicted_x < 0 else " ", round(predicted_x, 3), "" if predicted_y < 0 else " ", round(predicted_y, 3)))
             self.roll = self.calculate_speed(predicted_x) * self.scale_factor
             self.pitch = self.calculate_speed(predicted_y) * self.scale_factor
 

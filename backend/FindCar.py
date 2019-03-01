@@ -7,14 +7,14 @@ import numpy
 class CarFinder:
     # This is the colour that the target is.
     # Options are red, green, blue, white
-    REQUIRED_COLOUR = "red"
+    REQUIRED_COLOUR = "white"
 
     # Determines what range of pixels will be accepted. e.g. REQUIRED_COLOUR = green => the pixel must have red and
     # blue values less than what is given below, but a higher green value. White required all the pixel's values
     # to be higher
-    ACCEPTED_COLOUR = {"red": 180,
-                       "green": 100,
-                       "blue": 100}
+    ACCEPTED_COLOUR = {"red": 200,
+                       "green": 200,
+                       "blue": 200}
     # Another method of testing for a correctly coloured pixel. Pixel will be accepted if the REQUIRED_COLOUR
     # component is RGB_DIFFERENCE greater than both the other pixel colour components
     RGB_DIFFERENCE = 50

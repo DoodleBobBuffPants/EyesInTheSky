@@ -93,7 +93,7 @@ def find_and_update(frameq):
         frame = frameq.get()
         if frame is not None:
             x, y = car_finder.find_car(frame)
-            print("Actual: %.3f %.3f" % (round(x, 3), round(y, 3)))
+            print("Actual:    %s%.3f %s%.3f" % ("" if x < 0 else " ", round(x, 3), "" if y < 0 else " ", round(y, 3)))
             drone.update_coords(x, y)
 
 
