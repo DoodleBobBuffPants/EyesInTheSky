@@ -1,6 +1,6 @@
 # get function to test
 from src.video_retrieval.MediaPlayer import MediaPlayer as Mp
-from src.movement import FollowingDrone
+from src.Movement import FollowingDrone
 
 # noinspection SpellCheckingInspection
 testvid = "testvideo.mp4"  # test video - should use rtp://localhost:55004

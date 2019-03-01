@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, Response
 
-from src import movement
+from src import Movement
 from src.Camera import DroneCamera
 from src.FindCar import CarFinder
 from src.video_retrieval import MediaPlayer
@@ -27,14 +27,14 @@ app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17
 # TODO: might be better to have a separate connect button on interface ???
 
 # Create a single drone object on server
-drone = movement.FollowingDrone(num_retries=10)
+drone = Movement.FollowingDrone(num_retries=10)
 c = DroneCamera(drone)
 frame_copy = np.zeros((480, 856, 3))
 
 
 @app.route('/')
 def home():
-    return render_template('tester.html')
+    return render_template('index.html')
 
 
 @app.route('/change_rel_coords', methods=['POST'])
@@ -125,12 +125,6 @@ def gen():
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
-
-
-@app.route('/video_experiment')
-def vid():
-    return render_template('vid.html')
-
 
 @app.route('/video_feed')
 def video_feed():

@@ -1,4 +1,4 @@
-import src.movement as movement
+import src.Movement as movement
 import time
 from threading import Thread
 
