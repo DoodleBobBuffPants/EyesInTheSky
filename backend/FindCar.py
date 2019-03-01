@@ -162,7 +162,6 @@ class CarFinder:
         avg_y = sum_y / len(coord_list)
         return avg_x, avg_y
 
-
     @staticmethod
     def flip_pixel(pixel):
         """Takes a pixel in BGR form and converts to RGB"""

@@ -191,11 +191,16 @@ class FollowingDrone(Bebop):
 
             # Often have big swing backwards once drone reaches car
             # reduce the scale of the prediction when the relative coordinates are low
-            # OPTION 1:
+
+            # OPTION 1: no scaling
+            # x_scale = 1
+            # y_scale = 1
+
+            # OPTION 2:
             x_scale = 1 if abs(self.car_rel_x) < 0.2 else 0.4
             y_scale = 1 if abs(self.car_rel_y) < 0.2 else 0.4
 
-            # OPTION 2:
+            # OPTION 3:
             # x_scale = 0.7 * abs(self.car_rel_x) + 0.3
             # y_scale = 0.7 * abs(self.car_rel_y) + 0.3
 
