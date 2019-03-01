@@ -167,7 +167,7 @@ function CarFilter()
     function obj = setupSysObjs()
         % Initialize Video I/O
         %file setup
-        addpath(strcat(pwd,'/TrainingData'));
+        addpath(strcat(pwd,'/training_data'));
         % Create a video file reader.
         %Training data reader. Comment if reading from drone.
         obj.reader = vision.VideoFileReader('droneData2.mp4');
