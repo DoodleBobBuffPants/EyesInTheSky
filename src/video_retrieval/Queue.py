@@ -1,5 +1,5 @@
 # custom thread-safe queue class
-import frontend.Lock as Lock  # lock to handle synchronisation
+import src.video_retrieval.Lock as Lock  # lock to handle synchronisation
 
 
 class Queue:

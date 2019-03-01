@@ -62,7 +62,7 @@ def load_frame(lock, source, vc=None):
         return frame, vc
     elif source == 'mp4':
         if vc is None:  # set up video capture
-            vc = cv.VideoCapture('backend/TrainingData/droneData2.mp4')
+            vc = cv.VideoCapture('backend/training_data/droneData2.mp4')
         ret, frame = vc.read()
         return frame, vc
     else:
@@ -88,7 +88,7 @@ def coords_from_centroid(centroids, width, height):
 # optional argument: '-mp4': uses training data 3
 if __name__ == '__main__':
     import sys
-    from frontend import Lock
+    from src.video_retrieval import Lock
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "-mp4":

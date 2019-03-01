@@ -32,11 +32,9 @@ for _ in range(10):
     strip_packet(msg)
     # payload = stripPacket(msg)
 
-'''
-The received contents are H.264 encoded video. While we can put packets together, there doesn't seem to be documentation on
-manual conversion to video or images, as all methods result in using opencv or other libraries/apps. Hence we adopt the 
-opencv approach. This code can stay because it required far too much research to throw away.
-'''
+'''The received contents are H.264 encoded video. While we can put packets together, there doesn't seem to be 
+documentation on manual conversion to video or images, as all methods result in using opencv or other libraries/apps. 
+Hence we adopt the opencv approach. This code can stay because it required far too much research to throw away. '''
 
 # test message
 sock.close()

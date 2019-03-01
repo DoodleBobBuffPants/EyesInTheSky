@@ -210,7 +210,9 @@ class FollowingDrone(Bebop):
             predicted_y = self.car_rel_y + (
                     (self.car_rel_y - self.prev_car_rel_y) * (self.video_delay / self.movement_gap) * y_scale)
 
-            print("Predicted:                %s%.3f %s%.3f" % ("" if predicted_x < 0 else " ", round(predicted_x, 3), "" if predicted_y < 0 else " ", round(predicted_y, 3)))
+            print("Predicted: %s%.3f %s%.3f" % ("" if predicted_x < 0 else " ",
+                                                round(predicted_x, 3), "" if predicted_y < 0 else " ",
+                                                round(predicted_y, 3)))
             self.roll = self.calculate_speed(predicted_x) * self.scale_factor
             self.pitch = self.calculate_speed(predicted_y) * self.scale_factor
 

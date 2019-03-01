@@ -1,6 +1,6 @@
 # for shared coordinates
 # lock for synchronized use
-import frontend.Lock as Lock
+import src.video_retrieval.Lock as Lock
 
 
 class Point:

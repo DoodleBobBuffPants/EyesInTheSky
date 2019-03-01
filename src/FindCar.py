@@ -229,5 +229,6 @@ if __name__ == "__main__":
     print(original_x, original_y)
     radius = 10
 
-    draw.ellipse((original_x - radius, original_y - radius, original_x + radius, original_y + radius), fill=(0, 0, 0, 255))
+    draw.ellipse((original_x - radius, original_y - radius, original_x + radius, original_y + radius),
+                 fill=(0, 0, 0, 255))
     test_image.show()

@@ -1,5 +1,5 @@
 # test point
-import backend.Point as Point
+import src.Point as Point
 from threading import Thread
 
 

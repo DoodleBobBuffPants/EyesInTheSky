@@ -245,7 +245,7 @@ end
 function obj = setupSysObjs()
     % Initialize Video I/O
     %file setup
-    %addpath(strcat(pwd,'/TrainingData'));
+    %addpath(strcat(pwd,'/training_data'));
     % Create a video file reader.
     %TODO link to drone video feed
     % obj.reader = vision.VideoFileReader('data3.mp4');                 %DATA INPUT DEFINED HERE

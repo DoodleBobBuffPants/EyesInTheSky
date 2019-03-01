@@ -1,5 +1,5 @@
 import math
-from backend.movement import FollowingDrone
+from src.movement import FollowingDrone
 import time
 from threading import Thread
 

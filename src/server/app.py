@@ -7,10 +7,10 @@ import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, Response
 
-from backend import movement
-from backend.Camera import DroneCamera
-from backend.FindCar import CarFinder
-from frontend import MediaPlayer
+from src import movement
+from src.Camera import DroneCamera
+from src.FindCar import CarFinder
+from src.video_retrieval import MediaPlayer
 
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
 
