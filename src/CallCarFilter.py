@@ -76,7 +76,7 @@ def coords_from_centroid(centroids, width, height):
 
 
 # to test directly calling this file
-# optional argument: '-mp4': uses training data 3
+# optional argument: '-mp4': uses droneData2.mp4
 if __name__ == '__main__':
     import sys
     from src.video_retrieval import Lock
