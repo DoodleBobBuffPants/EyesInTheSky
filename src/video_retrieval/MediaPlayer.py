@@ -1,9 +1,9 @@
 # read frames using opencv and display frames as a video
 import cv2 as cv
 from threading import Thread
-import frontend.Lock as Lock
-import frontend.FrameGetter as Fg
-from frontend import Queue
+import src.video_retrieval.Lock as Lock
+import src.video_retrieval.FrameGetter as Fg
+from src.video_retrieval import Queue
 
 
 class MediaPlayer:

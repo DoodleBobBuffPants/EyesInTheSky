@@ -1,5 +1,5 @@
 # test for custom thread-safe queue
-import frontend.Queue as Queue  # custom queue
+import src.video_retrieval.Queue as Queue  # custom queue
 from threading import Thread  # prod/cons threads
 
 # initialise queue and counter

@@ -7,10 +7,10 @@ import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, Response
 
-from backend import movement
-from backend.Camera import DroneCamera
-from backend.FindCar import CarFinder
-from frontend import MediaPlayer
+from src import Movement
+from src.Camera import DroneCamera
+from src.FindCar import CarFinder
+from src.video_retrieval import MediaPlayer
 
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'protocol_whitelist;file,rtp,udp'
 
@@ -21,20 +21,17 @@ mp = MediaPlayer.MediaPlayer()
 
 app.secret_key = b'\xe7q\xb6j\xac\xbe!\xc77\x95%\xe2\x1eV\xfcD\xfce\xe8O\xde\x17\xf3\xd1'
 
-# Global-ish drone variable, this will only work when the server runs on a single thread and there is one user
-# sending requests TODO: change this so it is better
-# This also connects to the drone as soon as the server starts
-# TODO: might be better to have a separate connect button on interface ???
-
 # Create a single drone object on server
-drone = movement.FollowingDrone(num_retries=10)
+drone = Movement.FollowingDrone(num_retries=10)
+
+# Global camera object, initialised on server start
 c = DroneCamera(drone)
 frame_copy = np.zeros((480, 856, 3))
 
 
 @app.route('/')
 def home():
-    return render_template('tester.html')
+    return render_template('index.html')
 
 
 @app.route('/change_rel_coords', methods=['POST'])
@@ -125,11 +122,6 @@ def gen():
             ret, jpgframe = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpgframe.tobytes() + b'\r\n')
-
-
-@app.route('/video_experiment')
-def vid():
-    return render_template('vid.html')
 
 
 @app.route('/video_feed')
