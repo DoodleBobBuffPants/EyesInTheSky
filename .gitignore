@@ -1,0 +1,7 @@
+src/frame_for_filter.jpg
+frame.jpg
+*/__pycache__/
+*.pyc
+__pycache__/
+src/video_retrieval/bebop.sdp
+src/Matlab/carNet.mat
