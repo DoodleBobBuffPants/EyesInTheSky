@@ -16,7 +16,7 @@ def call_car_filter(bebop, lock, source='drone'):
         eng = matlab.engine.start_matlab()
 
     # cd to the matlab code in engine 
-    eng.cd("./backend/Matlab")
+    eng.cd("./src/matlab")
     # get handle to matlab object CarFilter
     cf = eng.CarFilterFrame()  # number of args returned from matlab (default 1)
     print("Matlab engine ready.")
@@ -28,14 +28,14 @@ def call_car_filter(bebop, lock, source='drone'):
 
     while True:
         # write the frame for the filter to read from
-        cv.imwrite("backend/frame_for_filter.jpg", frame)
+        cv.imwrite("src/matlab/frame_for_filter.jpg", frame)
         # run the car filter with current frame
-        a = eng.run(cf, "../frame_for_filter.jpg")
+        a = eng.run(cf, "frame_for_filter.jpg")
 
         # if the filter returns any centroids update bebop
         if len(a) > 0:
             x, y = coords_from_centroid(a[0], width, height)
-            if source == "drone":
+            if source == 'drone':
                 bebop.update_coords(x, y)
             else:
                 print(x, y)
@@ -53,7 +53,7 @@ def load_frame(lock, source, vc=None):
         return frame, vc
     elif source == 'mp4':
         if vc is None:  # set up video capture
-            vc = cv.VideoCapture('backend/training_data/droneData2.mp4')
+            vc = cv.VideoCapture('src/matlab/training_data/droneData2.mp4')
         ret, frame = vc.read()
         return frame, vc
     else:
